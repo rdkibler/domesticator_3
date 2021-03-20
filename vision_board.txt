@@ -1,10 +1,14 @@
-I want this version of domesticator to be a little more structure-aware than previous versions
+I want this version of domesticator to be a little more structure-aware than previous versions. This means both in terms of RNA structure as well as protein structure.
 
-This means both in terms of RNA structure as well as protein structure
-
-Without going full naturalizer, I will use the ideas set out by PreSynCodon. 
-
-I still need to learn viennaRNA/other to be able to effectively tackle the RNA structure
+This means 
+1) making it compatible with naturalizer, whenever that happens
+2) Learn viennaRNA and use it to optimize RNA structure
 
 I also want to change up how I do the optimization. dnachisel is fast, so I could do several
 rounds of optimization and pick the best one as suggested by several ppl in baker lab.
+
+Finally I want to make more use of genbank files for easier record keeping and easier optimization of complicated genes (e.g. multicistronic transcripts)
+
+Let's start from scratch with the latest release of dnachisel
+
+consider switching the name to DeNovatello or Michelangeneo, to make a stupid pun making reference to the fact that the underlying optimization library is dnachisel
