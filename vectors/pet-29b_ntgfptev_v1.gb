@@ -2,6 +2,8 @@ LOCUS       pET-29b_ntGFPtev_v1     6015 bp ds-DNA     circular     20-MAR-2021
 DEFINITION  .
 ACCESSION   urn.local...1e-7x9848a                                             
 VERSION     urn.local...1e-7x9848a                                             
+KEYWORDS    "specifications_group_1:AvoidPattern(\"AAAAAAA\"); AvoidPattern(\"T
+            TTTTT\");AvoidPattern(\"GGGGGG\");AvoidPattern(\"CCCCCC\"); "
 FEATURES             Location/Qualifiers
      misc_feature    12..467
                      /label="F1 origin"
@@ -54,6 +56,10 @@ FEATURES             Location/Qualifiers
                      /ApEinfo_revcolor=#84b0dc
                      /ApEinfo_fwdcolor=#84b0dc
      domesticator    5814..5849
+                     /label="specifications_group_1"
+                     /ApEinfo_revcolor=#d6b295
+                     /ApEinfo_fwdcolor=#d6b295
+     domesticator    5814..5849
                      /label="optimize codons"
                      /ApEinfo_revcolor=#85dae9
                      /ApEinfo_fwdcolor=#85dae9
@@ -62,7 +68,7 @@ FEATURES             Location/Qualifiers
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
      domesticator    5817..5849
-                     /label="insertion site 1"
+                     /label="insert(chainA)"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
      misc_feature    complement(5853..5882)
@@ -74,13 +80,13 @@ FEATURES             Location/Qualifiers
                      /ApEinfo_revcolor=#faac61
                      /ApEinfo_fwdcolor=#faac61
      misc_feature    complement(5929..5947)
-                     /label="T7_Terminal_primer"
-                     /ApEinfo_revcolor=#f8d3a9
-                     /ApEinfo_fwdcolor=#f8d3a9
-     misc_feature    complement(5929..5947)
                      /label="T7 term"
                      /ApEinfo_revcolor=#c7b0e3
                      /ApEinfo_fwdcolor=#c7b0e3
+     misc_feature    complement(5929..5947)
+                     /label="T7_Terminal_primer"
+                     /ApEinfo_revcolor=#f8d3a9
+                     /ApEinfo_fwdcolor=#f8d3a9
 ORIGIN
         1 tggcgaatgg gacgcgccct gtagcggcgc attaagcgcg gcgggtgtgg tggttacgcg
        61 cagcgtgacc gctacacttg ccagcgccct agcgcccgct cctttcgctt tcttcccttc
