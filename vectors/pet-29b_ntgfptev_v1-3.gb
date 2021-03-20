@@ -58,6 +58,10 @@ FEATURES             Location/Qualifiers
                      /label="specifications_group_1"
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
+                     /AvoidPattern="AAAAAA"
+                     /AvoidPattern="TTTTTT"
+                     /AvoidPattern="GGGGGG"
+                     /AvoidPattern="CCCCCC"
      domesticator    5814..5849
                      /label="optimize codons"
                      /ApEinfo_revcolor=#85dae9

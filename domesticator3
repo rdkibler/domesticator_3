@@ -1,4 +1,4 @@
-#!/home/rdkibler/.conda/envs/michelangeneo/bin/ipython
+#!/home/rdkibler/.conda/envs/michelangeneo/bin/python
 # -*- coding: utf-8 -*-
 
 ###### input handling ######
@@ -27,12 +27,17 @@ base_vector_record = vector_parsing.make_vector_record(args.vector)
 
 print(base_vector_record)
 
+print(dir(base_vector_record))
 
-## start debug block -- gives user the steering wheel
-import code
-print("now entering interactive console. Press Ctrl-D to return to the script")
-code.interact(local=locals())
-## end debug block
+for feature in base_vector_record.features:
+	if feature.type == "domesticator":
+		print(feature)
+
+# ## start debug block -- gives user the steering wheel
+# import code
+# print("now entering interactive console. Press Ctrl-D to return to the script")
+# code.interact(local=locals())
+# ## end debug block
 
 ###### define problems ######
 
