@@ -1,4 +1,4 @@
-#!/home/rdkibler/.conda/envs/michelangeneo/bin/python
+#!/home/rdkibler/.conda/envs/michelangeneo/bin/ipython
 # -*- coding: utf-8 -*-
 
 ###### input handling ######
@@ -25,6 +25,14 @@ from tools import vector_parsing
 ###### load files ######
 base_vector_record = vector_parsing.make_vector_record(args.vector)
 
+print(base_vector_record)
+
+
+## start debug block -- gives user the steering wheel
+import code
+print("now entering interactive console. Press Ctrl-D to return to the script")
+code.interact(local=locals())
+## end debug block
 
 ###### define problems ######
 

@@ -1,11 +1,16 @@
-from Bio import SeqRecord
+from Bio import SeqRecord, SeqIO
 
-def make_vector_record(vector_filepath) -> SeqRecord:
+def make_vector_record(vector_filepath) -> SeqRecord.SeqRecord:
 	"""Return Biopython SeqRecord
 
-	Simply a wrapper around Biopython SeqIO machinery to read a single vector file
+	Essentially a wrapper around Biopython SeqIO machinery to read a single vector file
 
 	rdkibler 210320
 	"""
-	print("SUCCESS")
-	return float
+	records = list(SeqIO.parse(vector_filepath,'genbank'))
+
+	if len(records) != 1:
+		raise RuntimeError("correctly formatted vector files only have one record -- the sequence of the vector")
+	record = records[0]
+
+	return record
