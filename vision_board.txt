@@ -12,3 +12,6 @@ Finally I want to make more use of genbank files for easier record keeping and e
 Let's start from scratch with the latest release of dnachisel
 
 consider switching the name to DeNovatello or Michelangeneo, to make a stupid pun making reference to the fact that the underlying optimization library is dnachisel
+
+Good datasets here for preventing unintended binding sites: http://regulondb.ccg.unam.mx/central_panel_menu/downloads_menu.jsp
+

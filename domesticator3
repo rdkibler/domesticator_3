@@ -1,3 +1,28 @@
 #!/home/rdkibler/.conda/envs/michelangeneo/bin/python
 
+###### input handling ######
+#this happens first so it fails quickly if bad inputs are given
 import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("protein", type=str, nargs="+", help="Either one or more fasta files containing one or more protein sequences or one or more pdb files")
+parser.add_argument("vector", type=str, help="A genbank (.gb) file containing annotations in the domesticator format to control domesticator function")
+
+args = parser.parse_args()
+
+
+###### load files ######
+
+
+
+###### define problems ######
+
+
+
+###### optimize ######
+
+
+
+
+###### output ######
