@@ -1,4 +1,5 @@
 #!/home/rdkibler/.conda/envs/michelangeneo/bin/python
+# -*- coding: utf-8 -*-
 
 ###### input handling ######
 #this happens first so it fails quickly if bad inputs are given
@@ -12,8 +13,17 @@ parser.add_argument("vector", type=str, help="A genbank (.gb) file containing an
 args = parser.parse_args()
 
 
-###### load files ######
+###### finish imports ######
 
+# Standard library imports
+
+# Third party imports
+
+# Local application imports
+from tools import vector_parsing 
+
+###### load files ######
+base_vector_record = vector_parsing.make_vector_record(args.vector)
 
 
 ###### define problems ######
