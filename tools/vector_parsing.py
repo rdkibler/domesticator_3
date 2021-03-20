@@ -8,4 +8,4 @@ def make_vector_record(vector_filepath) -> SeqRecord:
 	rdkibler 210320
 	"""
 	print("SUCCESS")
-	return SeqRecord()
+	return float
