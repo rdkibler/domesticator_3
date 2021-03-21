@@ -172,22 +172,6 @@ def replace_sequence_in_record(record, location, insert) -> SeqRecord.SeqRecord:
 	return record
 
 
-
-
-
-
-# def put_insert_into_vector(insert_record,vector_record,location_ID:str) -> SeqRecord.SeqRecord:
-# 	""" returns a SeqRecord
-
-# 	This function will insert one insert_record into a copy of the vector_record at 
-# 	the specified location (a single letter), making sure to adjust other annotations
-# 	as needed.
-
-# 	rdkibler 210320
-# 	"""
-# 	raise NotImplementedError()
-
-
 def make_naive_vector_records(base_vector_record, protein_filepaths) -> Generator[SeqRecord.SeqRecord,None,None]:
 	""" yields Biopython SeqRecord.SeqRecords
 

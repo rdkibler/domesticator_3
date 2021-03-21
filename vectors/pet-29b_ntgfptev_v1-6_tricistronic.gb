@@ -42,15 +42,19 @@ FEATURES             Location/Qualifiers
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
      misc_feature    827..1243
-                     /label="~UniquifyAllKmers(k=8,boost=10)"
-                     /ApEinfo_revcolor=#ff9ccd
-                     /ApEinfo_fwdcolor=#ff9ccd
-     misc_feature    827..1243
                      /label="@AvoidPattern(AAAAAA)"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
+    misc_feature    827..1243
+                     /label="~AvoidKmers(8,boost=10)"
+                     /ApEinfo_revcolor=#ff9ccd
+                     /ApEinfo_fwdcolor=#ff9ccd
      misc_feature    827..1243
-                     /label="@EnforceGCContent(mini=0.25,maxi=0.8,window=50)"
+                     /label="@EnforceGCContent(40-65%)"
+                     /ApEinfo_revcolor=#d6b295
+                     /ApEinfo_fwdcolor=#d6b295
+     misc_feature    827..1243
+                     /label="@EnforceGCContent(25-80%/50bp)"
                      /ApEinfo_revcolor=#9eafd2
                      /ApEinfo_fwdcolor=#9eafd2
      misc_feature    827..1243
@@ -61,12 +65,9 @@ FEATURES             Location/Qualifiers
                      /label="@AvoidPattern(TTTTTT)"
                      /ApEinfo_revcolor=#faac61
                      /ApEinfo_fwdcolor=#faac61
+
      misc_feature    827..1243
-                     /label="@EnforceGCContent(mini=0.4,maxi=0.65)"
-                     /ApEinfo_revcolor=#d6b295
-                     /ApEinfo_fwdcolor=#d6b295
-     misc_feature    827..1243
-                     /label="~CodonOptimize(species=e_coli,method=use_best_codon)"
+                     /label="~use_best_codon(e_coli)"
                      /ApEinfo_revcolor=#85dae9
                      /ApEinfo_fwdcolor=#85dae9
      domesticator    827..1243
@@ -81,10 +82,7 @@ FEATURES             Location/Qualifiers
                      /label="!insert(A)"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
-     misc_feature    862..958
-                     /label="~MinimizeRNASecondaryStructure()"
-                     /ApEinfo_revcolor=#d59687
-                     /ApEinfo_fwdcolor=#d59687
+
      misc_feature    888..908
                      /label="@AvoidChanges()"
                      /ApEinfo_revcolor=#ffef86
@@ -103,10 +101,7 @@ FEATURES             Location/Qualifiers
                      /label="!insert(B)"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
-     misc_feature    938..1037
-                     /label="~MinimizeRNASecondaryStructure()"
-                     /ApEinfo_revcolor=#d59687
-                     /ApEinfo_fwdcolor=#d59687
+
      misc_feature    967..987
                      /label="@AvoidChanges()"
                      /ApEinfo_revcolor=#f58a5e

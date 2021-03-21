@@ -20,6 +20,7 @@ args = parser.parse_args()
 # Standard library imports
 
 # Third party imports
+from dnachisel import DnaOptimizationProblem
 import Bio
 
 # Local application imports
@@ -31,10 +32,19 @@ base_vector_record = input_parsing.load_vector_record(args.vector)
 naive_vector_records = list(input_parsing.make_naive_vector_records(base_vector_record,args.proteins))
 
 ###### define problems ######
+problems = [DnaOptimizationProblem.from_record(record) for record in naive_vector_records]
+print(problems[0])
+print(dir(problems[0]))
+print(problems[0].constraints_text_summary())
+
+print(problems[0].objectives_text_summary())
+exit()
 
 
 
 ###### optimize ######
+for problem in problems:
+	print(problem)
 
 optimized_vector_records = naive_vector_records
 
