@@ -1,8 +1,10 @@
 import copy
 import os
 from typing import Generator
+import warnings
 
-from Bio import SeqRecord, SeqIO 
+from Bio import SeqRecord, SeqIO, BiopythonParserWarning
+from Bio.PDB.PDBExceptions import PDBConstructionWarning
 from Bio.Seq import Seq
 from Bio.SeqFeature import FeatureLocation, SeqFeature
 
@@ -55,14 +57,17 @@ def load_inserts(filenames) -> Generator[SeqRecord.SeqRecord,None,None]:
 				yield [SeqRecord.SeqRecord(seq=new_dna_seq,id=record.id,name=record.name,description=record.description,annotations={"molecule_type": "DNA"})]
 		else:
 			records = []
-			for record in SeqIO.parse(filename, "pdb-atom"):
-				orig_aa_seq = record.seq
-				new_dna_seq = Seq(reverse_translate(record.seq))
-				assert(orig_aa_seq == new_dna_seq.translate())
-				new_id = name + "_" + record.annotations['chain']
-				new_name = name + "_" + record.annotations['chain']
-				records.append(SeqRecord.SeqRecord(seq=new_dna_seq,id=new_id,name=new_name,description=record.description,annotations={"molecule_type": "DNA", "chain":record.annotations['chain']}))
-			yield records
+			with warnings.catch_warnings(): 
+				warnings.filterwarnings("ignore", category=PDBConstructionWarning)
+				warnings.filterwarnings("ignore", category=BiopythonParserWarning)
+				for record in SeqIO.parse(filename, "pdb-atom"):
+					orig_aa_seq = record.seq
+					new_dna_seq = Seq(reverse_translate(record.seq))
+					assert(orig_aa_seq == new_dna_seq.translate())
+					new_id = name + "_" + record.annotations['chain']
+					new_name = name + "_" + record.annotations['chain']
+					records.append(SeqRecord.SeqRecord(seq=new_dna_seq,id=new_id,name=new_name,description=record.description,annotations={"molecule_type": "DNA", "chain":record.annotations['chain']}))
+				yield records
 
 
 
@@ -182,16 +187,26 @@ def make_naive_vector_records(base_vector_record, protein_filepaths) -> Generato
 	"""
 
 	insert_locations = get_insert_locations(base_vector_record)
-	print(insert_locations)
+	#print(insert_locations)
 	for inserts in load_inserts(protein_filepaths):
+
 		if len(insert_locations) == 1:
 			for insert in inserts:
-				yield put_insert_into_vector(insert,base_vector_record,"A")
+				intermediate_vector_record = copy.deepcopy(base_vector_record)
+				intermediate_vector_record = replace_sequence_in_record(intermediate_vector_record, insert_locations[insert.annotations['chain']], insert)
+				vec_name = intermediate_vector_record.name
+				insert_name = insert.name
+				intermediate_vector_record.name = f"{insert_name}__{vec_name}"
+				yield 
 		else:
 			intermediate_vector_record = copy.deepcopy(base_vector_record)
 			for insert in inserts:
 				intermediate_insert_locations = get_insert_locations(intermediate_vector_record)
 				intermediate_vector_record = replace_sequence_in_record(intermediate_vector_record, intermediate_insert_locations[insert.annotations['chain']], insert)
+
+			vec_name = intermediate_vector_record.name
+			insert_name = insert.name[:-2] #cuts off _A or whatever chain ID it is
+			intermediate_vector_record.name = f"{insert_name}__{vec_name}"
 			yield intermediate_vector_record
 
 

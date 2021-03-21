@@ -48,6 +48,7 @@ def find_polypeptides(vector_record) -> list:
 					#print(codon)
 					cds_seq += codon
 			pp = SeqRecord.SeqRecord(cds_seq).translate()
+			pp.name = "HI"
 			found_polypeptides.append(pp)
 	return found_polypeptides
 

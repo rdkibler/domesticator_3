@@ -12,6 +12,7 @@ parser.add_argument("vector", type=str, help="A genbank (.gb) file containing an
 
 parser.add_argument("--nstruct", type=int, default=10, help="number of times to repeat optimization before picking one to return. Default: %(default)d")
 parser.add_argument("--max_tries", type=int, default=3, help="number of times to restart optimization before giving up if no solution is found. Default: %(default)d")
+parser.add_argument("--no_idt",action="store_true",help="Turn off complexity checking using IDT's API")
 
 parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
 
@@ -19,7 +20,6 @@ args = parser.parse_args()
 
 
 ###### finish imports ######
-
 # Standard library imports
 import copy
 
@@ -28,6 +28,7 @@ from dnachisel import DnaOptimizationProblem, NoSolutionError
 from dnachisel import DEFAULT_SPECIFICATIONS_DICT
 import Bio
 import numpy as np
+import pandas as pd
 
 # Local application imports
 from tools import input_parsing, product_analysis, idt
@@ -36,16 +37,16 @@ from specifications.MinimizeNumKmers import MinimizeNumKmers
 DEFAULT_SPECIFICATIONS_DICT['MinimizeNumKmers'] = MinimizeNumKmers
 
 ###### load files ######
-idt_user_info = idt.get_user_info(idt.user_info_file)
+if not args.no_idt:
+	idt_user_info = idt.get_user_info(idt.user_info_file)
 
 base_vector_record = input_parsing.load_vector_record(args.vector)
 naive_vector_records = input_parsing.make_naive_vector_records(base_vector_record,args.proteins)
 
-
-
 ###### optimize ######
-optimized_vector_records = []
+optimized_vector_solutions = []
 for record in naive_vector_records:
+	print(f"Attempting optimization of {record.name}")
 	initial_problem = DnaOptimizationProblem.from_record(record)
 	# print(dir(initial_problem))
 	solutions = []
@@ -65,59 +66,70 @@ for record in naive_vector_records:
 			initial_problem.max_random_iters += 1000
 			trial += 1
 
-	#scores = [solution.objectives_evaluations().scores_sum() for solution in solutions]
-	#best_idx = np.argmin(scores)
+	
+	if not args.no_idt:
+		print("querying IDT")
+		idt_scores = []
+		for i,solution in enumerate(solutions):
+			sol_record = solution.to_record()
+			seq = ""
+			for feature in sol_record.features:
+				if feature.type == "domesticator" and feature.qualifiers['label'] == ["synthesize"]:
+					seq = feature.extract(sol_record.seq)
+					break
+			assert seq != ""
 
-	print("querying IDT")
-	idt_scores = []
-	for i,solution in enumerate(solutions):
-		sol_record = solution.to_record()
-		seq = ""
-		for feature in sol_record.features:
-			if feature.type == "domesticator" and feature.qualifiers['label'] == ["synthesize"]:
-				seq = feature.extract(sol_record.seq)
-				break
-		assert seq != ""
+			idt_token = idt.get_token(idt.token_file,idt_user_info)
+			response = idt.query_complexity(seq,idt_token["access_token"])
+			# if len(response[0]) == 0:
+			# 	print("no issue!")
+			score_sum = 0
+			print(f"SOLUTION {i+1}:")
+			for issue in response[0]:
+				print(issue["Score"],issue["Name"])
+				score_sum += issue["Score"]
+			print(f"Total Score: {score_sum}")
+			print()
+			idt_scores.append(score_sum)
 
-		idt_token = idt.get_token(idt.token_file,idt_user_info)
-		response = idt.query_complexity(seq,idt_token["access_token"])
-		# if len(response[0]) == 0:
-		# 	print("no issue!")
-		score_sum = 0
-		print(f"SOLUTION {i+1}:")
-		for issue in response[0]:
-			print(issue["Score"],issue["Name"])
-			score_sum += issue["Score"]
-		print(f"Total Score: {score_sum}")
-		print()
-		idt_scores.append(score_sum)
-
-
-	best_idx = np.argmin(idt_scores)
-
+		best_idx = np.argmin(idt_scores)
+	else:
+		scores = [solution.objectives_evaluations().scores_sum() for solution in solutions]
+		best_idx = np.argmin(scores)
 
 	best_solution = solutions[best_idx]
+	optimized_vector_solutions.append(best_solution)
 
-	print(best_solution.constraints_text_summary())
-	print(best_solution.objectives_text_summary())
-	optimized_vector_records.append(best_solution.to_record())
-
-
-
-###### create reports and output ######
-
-Bio.SeqIO.write(optimized_vector_records, "output.gb","genbank")
+###### create reports and outputs ######
 print("REPORT")
-for optimized_vector_record in optimized_vector_records:
-	polypeptides = product_analysis.find_polypeptides(optimized_vector_record)
-	print(polypeptides)
+records_to_synthesize = []
+all_protein_params = []
+for optimized_vector_solution in optimized_vector_solutions:
+	optimized_vector_record = optimized_vector_solution.record
 
+	Bio.SeqIO.write(optimized_vector_record, optimized_vector_record.name + ".gb","genbank")
+
+	fragment_to_synthesize = None
+	for feature in optimized_vector_record.features:
+			if feature.type == "domesticator" and feature.qualifiers['label'] == ["synthesize"]:
+				fragment_to_synthesize = feature.extract(optimized_vector_record.seq)
+				break
+	assert fragment_to_synthesize != ""
+	record_to_synthesize = Bio.SeqRecord.SeqRecord(seq=fragment_to_synthesize,id=optimized_vector_record.name,name=optimized_vector_record.name,description="")
+	
+	records_to_synthesize.append(record_to_synthesize)
+
+	with open(optimized_vector_record.name + ".log",'w') as f:
+		f.write(optimized_vector_solution.constraints_text_summary() + "\n")
+		f.write(optimized_vector_solution.objectives_text_summary() + "\n")
+
+	polypeptides = product_analysis.find_polypeptides(optimized_vector_record)
 	protein_params = product_analysis.get_params(polypeptides)
-	protein_params.to_csv("translated_proteins.params")
+	all_protein_params.append(protein_params)
 	#TODO: Add support for detection of protease cleavage sites and printing of the fragment params
 
-
-
+pd.concat(all_protein_params).to_csv("translated_proteins.params")
+Bio.SeqIO.write(records_to_synthesize, "order.dna.fasta","fasta")
 
 
 
