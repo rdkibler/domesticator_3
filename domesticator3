@@ -7,7 +7,7 @@ import argparse
 
 parser = argparse.ArgumentParser(prog='domesticator3', description='A sophisticated codon optimizer for the discerning protein designer')
 
-parser.add_argument("protein", type=str, nargs="+", help="Either one or more fasta files containing one or more protein sequences or one or more pdb files")
+parser.add_argument("proteins", type=str, nargs="+", help="Either one or more fasta files containing one or more protein sequences or one or more pdb files")
 parser.add_argument("vector", type=str, help="A genbank (.gb) file containing annotations in the domesticator format to control domesticator function")
 
 parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
@@ -22,21 +22,13 @@ args = parser.parse_args()
 # Third party imports
 
 # Local application imports
-from tools import vector_parsing, product_analysis
+from tools import input_parsing, product_analysis
 
 ###### load files ######
-base_vector_record = vector_parsing.make_vector_record(args.vector)
+base_vector_record = input_parsing.load_vector_record(args.vector)
 
-print(base_vector_record)
-
-print(dir(base_vector_record))
-
-# ## start debug block -- gives user the steering wheel
-# import code
-# print("now entering interactive console. Press Ctrl-D to return to the script")
-# code.interact(local=locals())
-# ## end debug block
-
+#TODO this is temporarily cast as list for debugging reasons
+naive_vector_records = list(input_parsing.make_naive_vector_records(base_vector_record,args.proteins))
 ###### define problems ######
 
 
@@ -51,4 +43,17 @@ print("REPORT")
 polypeptides = product_analysis.find_polypeptides(base_vector_record)
 print(polypeptides)
 
-print(product_analysis.get_params(polypeptides))
+protein_params = product_analysis.get_params(polypeptides)
+protein_params.to_csv("translated_proteins.params")
+#TODO: Add support for detection of protease cleavage sites and printing of the fragment params
+
+
+
+
+
+
+# ## start debug block -- gives user the steering wheel
+# import code
+# print("now entering interactive console. Press Ctrl-D to return to the script")
+# code.interact(local=locals())
+# ## end debug block
