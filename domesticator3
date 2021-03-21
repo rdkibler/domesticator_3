@@ -26,9 +26,9 @@ from tools import input_parsing, product_analysis
 
 ###### load files ######
 base_vector_record = input_parsing.load_vector_record(args.vector)
-
 #TODO this is temporarily cast as list for debugging reasons
 naive_vector_records = list(input_parsing.make_naive_vector_records(base_vector_record,args.proteins))
+
 ###### define problems ######
 
 
