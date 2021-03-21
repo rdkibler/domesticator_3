@@ -112,7 +112,7 @@ def replace_sequence_in_record(record, location, insert) -> SeqRecord.SeqRecord:
 	processed_features = []
 
 	#add a feature for the insert
-	processed_features.append(SeqFeature(location=FeatureLocation(location.start,location.end + seq_diff, strand=location.strand), type="protein", qualifiers={'label':record.id}))
+	processed_features.append(SeqFeature(location=FeatureLocation(location.start,location.end + seq_diff, strand=location.strand), type="protein", qualifiers={'label':insert.id}))
 
 	for feat in record.features:
 
