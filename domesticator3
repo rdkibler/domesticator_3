@@ -26,6 +26,7 @@ import copy
 # Third party imports
 from dnachisel import DnaOptimizationProblem, NoSolutionError
 import Bio
+import numpy as np
 
 # Local application imports
 from tools import input_parsing, product_analysis
@@ -38,6 +39,7 @@ naive_vector_records = input_parsing.make_naive_vector_records(base_vector_recor
 optimized_vector_records = []
 for record in naive_vector_records:
 	initial_problem = DnaOptimizationProblem.from_record(record)
+	print(dir(initial_problem))
 	solutions = []
 	iteration = 0
 	trial = 0
@@ -55,13 +57,13 @@ for record in naive_vector_records:
 			initial_problem.max_random_iters += 1000
 			trial += 1
 
-	for solution in solutions:
-		print(solution.objectives_text_summary())
+	scores = [solution.objectives_evaluations().scores_sum() for solution in solutions]
+	best_idx = np.argmin(scores)
+	best_solution = solutions[best_idx]
 
-
-
-
-	optimized_vector_records.append(problem.to_record())
+	print(best_solution.constraints_text_summary())
+	print(best_solution.objectives_text_summary())
+	optimized_vector_records.append(best_solution.to_record())
 
 
 
