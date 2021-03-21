@@ -10,6 +10,9 @@ parser = argparse.ArgumentParser(prog='domesticator3', description='A sophistica
 parser.add_argument("proteins", type=str, nargs="+", help="Either one or more fasta files containing one or more protein sequences or one or more pdb files")
 parser.add_argument("vector", type=str, help="A genbank (.gb) file containing annotations in the domesticator format to control domesticator function")
 
+parser.add_argument("--nstruct", type=int, default=10, help="number of times to repeat optimization before picking one to return. Default: %(default)d")
+parser.add_argument("--max_tries", type=int, default=3, help="number of times to restart optimization before giving up if no solution is found. Default: %(default)d")
+
 parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
 
 args = parser.parse_args()
@@ -18,9 +21,10 @@ args = parser.parse_args()
 ###### finish imports ######
 
 # Standard library imports
+import copy
 
 # Third party imports
-from dnachisel import DnaOptimizationProblem
+from dnachisel import DnaOptimizationProblem, NoSolutionError
 import Bio
 
 # Local application imports
@@ -28,25 +32,37 @@ from tools import input_parsing, product_analysis
 
 ###### load files ######
 base_vector_record = input_parsing.load_vector_record(args.vector)
-#TODO this is temporarily cast as list for debugging reasons
-naive_vector_records = list(input_parsing.make_naive_vector_records(base_vector_record,args.proteins))
-
-###### define problems ######
-problems = [DnaOptimizationProblem.from_record(record) for record in naive_vector_records]
-print(problems[0])
-print(dir(problems[0]))
-print(problems[0].constraints_text_summary())
-
-print(problems[0].objectives_text_summary())
-exit()
-
-
+naive_vector_records = input_parsing.make_naive_vector_records(base_vector_record,args.proteins)
 
 ###### optimize ######
-for problem in problems:
-	print(problem)
+optimized_vector_records = []
+for record in naive_vector_records:
+	initial_problem = DnaOptimizationProblem.from_record(record)
+	solutions = []
+	iteration = 0
+	trial = 0
+	while iteration < args.nstruct and trial < args.max_tries:
+		try:
+			print(f"iteration {iteration + 1}/{args.nstruct}")
+			problem = copy.deepcopy(initial_problem)
+			problem.resolve_constraints_by_random_mutations()
+			problem.optimize()
+			problem.resolve_constraints(final_check=True)
+			solutions.append(problem)
+			iteration += 1
+		except NoSolutionError:
+			print("no solution found. Retrying...")
+			initial_problem.max_random_iters += 1000
+			trial += 1
 
-optimized_vector_records = naive_vector_records
+	for solution in solutions:
+		print(solution.objectives_text_summary())
+
+
+
+
+	optimized_vector_records.append(problem.to_record())
+
 
 
 ###### create reports and output ######

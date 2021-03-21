@@ -45,10 +45,7 @@ FEATURES             Location/Qualifiers
                      /label="@AvoidPattern(AAAAAA)"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
-    misc_feature    827..1243
-                     /label="~AvoidKmers(8,boost=10)"
-                     /ApEinfo_revcolor=#ff9ccd
-                     /ApEinfo_fwdcolor=#ff9ccd
+
      misc_feature    827..1243
                      /label="@EnforceGCContent(40-65%)"
                      /ApEinfo_revcolor=#d6b295
@@ -132,7 +129,11 @@ FEATURES             Location/Qualifiers
                      /label="!insert(C)"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
-     misc_feature    join(1241..6393,1..829)
+     misc_feature    1241..6393
+                     /label="@AvoidChanges"
+                     /ApEinfo_revcolor=#84b0dc
+                     /ApEinfo_fwdcolor=#84b0dc
+     misc_feature    1..829
                      /label="@AvoidChanges"
                      /ApEinfo_revcolor=#84b0dc
                      /ApEinfo_fwdcolor=#84b0dc
