@@ -25,11 +25,15 @@ import copy
 
 # Third party imports
 from dnachisel import DnaOptimizationProblem, NoSolutionError
+from dnachisel import DEFAULT_SPECIFICATIONS_DICT
 import Bio
 import numpy as np
 
 # Local application imports
 from tools import input_parsing, product_analysis
+from specifications.MinimizeNumKmers import MinimizeNumKmers
+
+DEFAULT_SPECIFICATIONS_DICT['MinimizeNumKmers'] = MinimizeNumKmers
 
 ###### load files ######
 base_vector_record = input_parsing.load_vector_record(args.vector)

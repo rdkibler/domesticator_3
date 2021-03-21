@@ -62,7 +62,8 @@ FEATURES             Location/Qualifiers
                      /label="@AvoidPattern(TTTTTT)"
                      /ApEinfo_revcolor=#faac61
                      /ApEinfo_fwdcolor=#faac61
-
+     misc_feature    827..1243
+                     /label="~MinimizeNumKmers(8, boost=10)"
      misc_feature    827..1243
                      /label="~use_best_codon(e_coli)"
                      /ApEinfo_revcolor=#85dae9
