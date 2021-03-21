@@ -193,7 +193,7 @@ def make_naive_vector_records(base_vector_record, protein_filepaths) -> Generato
 		if len(insert_locations) == 1:
 			for insert in inserts:
 				intermediate_vector_record = copy.deepcopy(base_vector_record)
-				intermediate_vector_record = replace_sequence_in_record(intermediate_vector_record, insert_locations[insert.annotations['chain']], insert)
+				intermediate_vector_record = replace_sequence_in_record(intermediate_vector_record, insert_locations["A"], insert)
 				vec_name = intermediate_vector_record.name
 				insert_name = insert.name
 				intermediate_vector_record.name = f"{insert_name}__{vec_name}"
