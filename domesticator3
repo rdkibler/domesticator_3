@@ -20,6 +20,7 @@ args = parser.parse_args()
 # Standard library imports
 
 # Third party imports
+import Bio
 
 # Local application imports
 from tools import input_parsing, product_analysis
@@ -35,17 +36,20 @@ naive_vector_records = list(input_parsing.make_naive_vector_records(base_vector_
 
 ###### optimize ######
 
-
+optimized_vector_records = naive_vector_records
 
 
 ###### create reports and output ######
-print("REPORT")
-polypeptides = product_analysis.find_polypeptides(base_vector_record)
-print(polypeptides)
 
-protein_params = product_analysis.get_params(polypeptides)
-protein_params.to_csv("translated_proteins.params")
-#TODO: Add support for detection of protease cleavage sites and printing of the fragment params
+Bio.SeqIO.write(optimized_vector_records, "output.gb","genbank")
+print("REPORT")
+for optimized_vector_record in optimized_vector_records:
+	polypeptides = product_analysis.find_polypeptides(optimized_vector_record)
+	print(polypeptides)
+
+	protein_params = product_analysis.get_params(polypeptides)
+	protein_params.to_csv("translated_proteins.params")
+	#TODO: Add support for detection of protease cleavage sites and printing of the fragment params
 
 
 

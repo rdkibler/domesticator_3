@@ -2,8 +2,9 @@ import copy
 import os
 from typing import Generator
 
-from Bio import SeqRecord, SeqIO
+from Bio import SeqRecord, SeqIO 
 from Bio.Seq import Seq
+from Bio.SeqFeature import FeatureLocation, SeqFeature
 
 from dnachisel import reverse_translate
 
@@ -88,7 +89,7 @@ def get_insert_locations(record) -> dict:
 
 
 
-def replace_sequence_in_record(record, location, new_seq) -> SeqRecord.SeqRecord:
+def replace_sequence_in_record(record, location, insert) -> SeqRecord.SeqRecord:
 	""" Returns a modified seqrecord
 
 	This function was borrowed from Domesticator1. It replaces the sequence in the record 
@@ -98,17 +99,20 @@ def replace_sequence_in_record(record, location, new_seq) -> SeqRecord.SeqRecord
 
 	# I don't know if this is right. What does the strand number mean? --rdkibler 210320
 	if location.strand >= 0:
-		adjusted_seq = record.seq[:location.start] + new_seq.seq + record.seq[location.end:]
+		adjusted_seq = record.seq[:location.start] + insert.seq + record.seq[location.end:]
 	else:
-		adjusted_seq = record.seq[:location.start] + new_seq.reverse_complement().seq + record.seq[location.end:]
+		adjusted_seq = record.seq[:location.start] + insert.reverse_complement().seq + record.seq[location.end:]
 
 	record.seq = adjusted_seq
 
-	seq_diff = len(new_seq) - len(location)
+	seq_diff = len(insert) - len(location)
 	orig_start = location.start
 	orig_end = location.end
 
 	processed_features = []
+
+	#add a feature for the insert
+	processed_features.append(SeqFeature(location=FeatureLocation(location.start,location.end + seq_diff, strand=location.strand), type="protein", qualifiers={'label':record.id}))
 
 	for feat in record.features:
 
@@ -129,19 +133,18 @@ def replace_sequence_in_record(record, location, new_seq) -> SeqRecord.SeqRecord
 			elif subloc.start == location.start and subloc.end == location.end:
 				new_loc = FeatureLocation(location.start, location.end + seq_diff, strand=subloc.strand)
 
-
-
 			#type 2: where they start or end inside the location
-			#-> chop off. don't forget to add on approprate amount
-			##THINK! does strand even matter? How is start and end defined? I'm assuming that for strand -1 things are flipped but that's 
-			##probably not how it's implemented. Also, consider strand = 0 (no direction). There is probably an easier way. 
+			#I assume that the total length of the annotation is important, so adjust the annotation to have the correct
+			# length anchored outside of the insert, unless it'd extend through the insert
 			elif subloc.start >= location.start and subloc.start <= location.end:
-				new_loc = FeatureLocation(location.end + seq_diff, subloc.end + seq_diff, strand=subloc.strand)
+				#we already caught the case where it's fully within, so I know the end of the subloc extends after the end of the insert 
+				new_loc = FeatureLocation(max(subloc.end + seq_diff - len(subloc),location.start), subloc.end + seq_diff, strand=subloc.strand)
+				assert len(new_loc) == len(subloc)
 
 			elif subloc.end >= location.start and subloc.end <= location.end:
-				new_loc = FeatureLocation(subloc.start, location.start, strand=subloc.strand)
+				new_loc = FeatureLocation(subloc.start, min(subloc.end, location.end + seq_diff), strand=subloc.strand)
+				assert len(new_loc) == len(subloc)
 				
-
 			#type 3: where they span the location 
 			#-> keep the leftmost point same and add diff to rightmost. do not split
 			elif location.start >= subloc.start and location.start <= subloc.end and location.end >= subloc.start and location.end <= subloc.end:
@@ -173,16 +176,16 @@ def replace_sequence_in_record(record, location, new_seq) -> SeqRecord.SeqRecord
 
 
 
-def put_insert_into_vector(insert_record,vector_record,location_ID:str) -> SeqRecord.SeqRecord:
-	""" returns a SeqRecord
+# def put_insert_into_vector(insert_record,vector_record,location_ID:str) -> SeqRecord.SeqRecord:
+# 	""" returns a SeqRecord
 
-	This function will insert one insert_record into a copy of the vector_record at 
-	the specified location (a single letter), making sure to adjust other annotations
-	as needed.
+# 	This function will insert one insert_record into a copy of the vector_record at 
+# 	the specified location (a single letter), making sure to adjust other annotations
+# 	as needed.
 
-	rdkibler 210320
-	"""
-	raise NotImplementedError()
+# 	rdkibler 210320
+# 	"""
+# 	raise NotImplementedError()
 
 
 def make_naive_vector_records(base_vector_record, protein_filepaths) -> Generator[SeqRecord.SeqRecord,None,None]:
@@ -203,7 +206,8 @@ def make_naive_vector_records(base_vector_record, protein_filepaths) -> Generato
 		else:
 			intermediate_vector_record = copy.deepcopy(base_vector_record)
 			for insert in inserts:
-				intermediate_vector_record = put_insert_into_vector(insert, intermediate_vector_record, insert.annotations['chain'])
+				intermediate_insert_locations = get_insert_locations(intermediate_vector_record)
+				intermediate_vector_record = replace_sequence_in_record(intermediate_vector_record, intermediate_insert_locations[insert.annotations['chain']], insert)
 			yield intermediate_vector_record
 
 
