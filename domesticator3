@@ -5,10 +5,12 @@
 #this happens first so it fails quickly if bad inputs are given
 import argparse
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(prog='domesticator3', description='A sophisticated codon optimizer for the discerning protein designer')
 
 parser.add_argument("protein", type=str, nargs="+", help="Either one or more fasta files containing one or more protein sequences or one or more pdb files")
 parser.add_argument("vector", type=str, help="A genbank (.gb) file containing annotations in the domesticator format to control domesticator function")
+
+parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
 
 args = parser.parse_args()
 
@@ -20,7 +22,7 @@ args = parser.parse_args()
 # Third party imports
 
 # Local application imports
-from tools import vector_parsing 
+from tools import vector_parsing, product_analysis
 
 ###### load files ######
 base_vector_record = vector_parsing.make_vector_record(args.vector)
@@ -28,10 +30,6 @@ base_vector_record = vector_parsing.make_vector_record(args.vector)
 print(base_vector_record)
 
 print(dir(base_vector_record))
-
-for feature in base_vector_record.features:
-	if feature.type == "domesticator":
-		print(feature)
 
 # ## start debug block -- gives user the steering wheel
 # import code
@@ -49,3 +47,8 @@ for feature in base_vector_record.features:
 
 
 ###### create reports and output ######
+print("REPORT")
+polypeptides = product_analysis.find_polypeptides(base_vector_record)
+print(polypeptides)
+
+print(product_analysis.get_params(polypeptides))
