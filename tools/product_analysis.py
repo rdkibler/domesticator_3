@@ -39,7 +39,9 @@ def find_polypeptides(vector_record) -> list:
 	found_polypeptides = []
 
 	for feature in vector_record.features:
+
 		if feature.type == "domesticator" and feature.qualifiers['label'] == ["start"]:
+			translation_start = feature.location.start
 			cds_seq = ""
 			for codon in iterate_circular_sequence(feature.location.start, vector_record.seq):
 				if codon in ["TAA","TAG","TGA"]:
@@ -48,7 +50,26 @@ def find_polypeptides(vector_record) -> list:
 					#print(codon)
 					cds_seq += codon
 			pp = SeqRecord.SeqRecord(cds_seq).translate()
-			pp.name = "HI"
+			
+			#look for all protein features between start and stop and add them to the name
+			translation_length = len(cds_seq)
+			translation_end = translation_start + translation_length
+			name = ""
+			features_for_naming = []
+			for feature2 in vector_record.features:
+				if feature2.type == "protein" \
+				and feature2.location.start >= translation_start \
+				and feature2.location.start < translation_end \
+				and feature2.location.end > translation_start \
+				and feature2.location.end <=translation_end:
+					features_for_naming.append(feature2)
+
+			features_for_naming.sort(key=lambda x: x.location.start)
+
+			name = "-".join([feat.qualifiers['label'][0] for feat in features_for_naming])
+
+			pp.name = name
+
 			found_polypeptides.append(pp)
 	return found_polypeptides
 
@@ -73,6 +94,6 @@ def get_params(records) -> pd.DataFrame:
 		reduced_ec, oxidized_ec = params.molar_extinction_coefficient()
 		reduced_mec = reduced_ec / params.molecular_weight()
 		oxidized_mec = oxidized_ec / params.molecular_weight()
-		param_dict[record.id] = [seq,params.molecular_weight(), mono_params.molecular_weight(), params.isoelectric_point(), reduced_ec, reduced_mec, oxidized_ec, oxidized_mec]
+		param_dict[record.name] = [seq,params.molecular_weight(), mono_params.molecular_weight(), params.isoelectric_point(), reduced_ec, reduced_mec, oxidized_ec, oxidized_mec]
 	param_df = pd.DataFrame().from_dict(param_dict, orient='index', columns=["seq","average mass","monoisotopic mass","pI","molar extinction coefficient (reduced)", "mass extinction coefficient (reduced)","molar extinction coefficient (oxidized)","mass extinction coefficient (oxidized)"])
 	return param_df

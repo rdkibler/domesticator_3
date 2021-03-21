@@ -7,10 +7,10 @@ FEATURES             Location/Qualifiers
                      /label="T7 Promoter"
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
-     misc_feature    18..985
-                     /label="~MinimizeRNASecondaryStructure()"
-                     /ApEinfo_revcolor=#ff9ccd
-                     /ApEinfo_fwdcolor=#ff9ccd
+     misc_feature    1..829
+                     /label="@AvoidChanges"
+                     /ApEinfo_revcolor=#84b0dc
+                     /ApEinfo_fwdcolor=#84b0dc
      misc_binding    20..42
                      /label="LacO"
                      /ApEinfo_revcolor=#84b0dc
@@ -23,7 +23,7 @@ FEATURES             Location/Qualifiers
                      /label="start"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
-     tag             89..802
+     protein         89..802
                      /label="sfGFP"
                      /ApEinfo_revcolor=#b1ff67
                      /ApEinfo_fwdcolor=#b1ff67
@@ -35,57 +35,55 @@ FEATURES             Location/Qualifiers
                      /label="IDT Insertion F"
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
-     peptide         809..826
+     protein         809..826
                      /label="TEV"
                      /ApEinfo_revcolor=#84b0dc
                      /ApEinfo_fwdcolor=#84b0dc
-     CDS             809..826
-                     /label="Translation 809-826"
-     misc_feature    827..887
-                     /label="~CodonOptimize(species=e_coli,method=use_best_codon)"
-                     /ApEinfo_revcolor=#85dae9
-                     /ApEinfo_fwdcolor=#85dae9
-     misc_feature    827..890
-                     /label="@AvoidPattern(AAAAAA)"
-                     /ApEinfo_revcolor=#ff9ccd
-                     /ApEinfo_fwdcolor=#ff9ccd
-     misc_feature    827..890
-                     /label="@AvoidHairpins()"
-                     /ApEinfo_revcolor=#d59687
-                     /ApEinfo_fwdcolor=#d59687
-     domesticator    827..890
-                     /label="synthesize"
-                     /ApEinfo_revcolor=#d6b295
-                     /ApEinfo_fwdcolor=#d6b295
-     misc_feature    827..890
-                     /label="@EnforceGCContent(mini=0.4,maxi=0.65)"
-                     /ApEinfo_revcolor=#d6b295
-                     /ApEinfo_fwdcolor=#d6b295
-     misc_feature    827..890
-                     /label="@EnforceGCContent(mini=0.25,maxi=0.8,window=50)"
-                     /ApEinfo_revcolor=#9eafd2
-                     /ApEinfo_fwdcolor=#9eafd2
      misc_feature    827..890
                      /label="@AvoidPattern(GGGGGG)"
                      /ApEinfo_revcolor=#faac61
                      /ApEinfo_fwdcolor=#faac61
      misc_feature    827..890
+                     /label="@EnforceGCContent(40-65%)"
+                     /ApEinfo_revcolor=#d6b295
+                     /ApEinfo_fwdcolor=#d6b295
+     misc_feature    827..890
                      /label="@AvoidPattern(TTTTTT)"
                      /ApEinfo_revcolor=#faac61
                      /ApEinfo_fwdcolor=#faac61
      misc_feature    827..890
-                     /label="~UniquifyAllKmers(k=8,boost=10)"
-                     /ApEinfo_revcolor=#ff9ccd
-                     /ApEinfo_fwdcolor=#ff9ccd
+                     /label="~MinimizeNumKmers(8, boost=10)"
+                     /ApEinfo_revcolor=#c6c9d1
+                     /ApEinfo_fwdcolor=#c6c9d1
+     misc_feature    827..890
+                     /label="@AvoidHairpins()"
+                     /ApEinfo_revcolor=#d59687
+                     /ApEinfo_fwdcolor=#d59687
      misc_feature    827..890
                      /label="@AvoidPattern(CCCCCC)"
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
+     misc_feature    827..890
+                     /label="@AvoidPattern(AAAAAA)"
+                     /ApEinfo_revcolor=#ff9ccd
+                     /ApEinfo_fwdcolor=#ff9ccd
+     domesticator    827..890
+                     /label="synthesize"
+                     /ApEinfo_revcolor=#d6b295
+                     /ApEinfo_fwdcolor=#d6b295
+     misc_feature    827..890
+                     /label="@EnforceGCContent(25-80%/50bp)"
+                     /ApEinfo_revcolor=#9eafd2
+                     /ApEinfo_fwdcolor=#9eafd2
+     misc_feature    827..890
+                     /label="~use_best_codon(e_coli)"
+                     /ApEinfo_revcolor=#85dae9
+                     /ApEinfo_fwdcolor=#85dae9
      misc_feature    830..887
                      /label="!insert(A)"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
-     misc_feature    join(888..6040,1..829)
+     misc_feature    888..6040
                      /label="@AvoidChanges"
                      /ApEinfo_revcolor=#84b0dc
                      /ApEinfo_fwdcolor=#84b0dc
@@ -93,7 +91,7 @@ FEATURES             Location/Qualifiers
                      /label="IDT Insertion R"
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
-     misc_feature    897..914
+     protein         897..914
                      /label="6xHis"
                      /ApEinfo_revcolor=#faac61
                      /ApEinfo_fwdcolor=#faac61

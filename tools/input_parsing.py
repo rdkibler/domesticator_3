@@ -54,7 +54,7 @@ def load_inserts(filenames) -> Generator[SeqRecord.SeqRecord,None,None]:
 				orig_aa_seq = record.seq
 				new_dna_seq = Seq(reverse_translate(record.seq))
 				assert(orig_aa_seq == new_dna_seq.translate())
-				yield [SeqRecord.SeqRecord(seq=new_dna_seq,id=record.id,name=record.name,description=record.description,annotations={"molecule_type": "DNA"})]
+				yield [SeqRecord.SeqRecord(seq=new_dna_seq,id=record.id,name=record.name,description=record.description,annotations={"molecule_type": "DNA", "chain":"A"})]
 		else:
 			records = []
 			with warnings.catch_warnings(): 
@@ -117,7 +117,7 @@ def replace_sequence_in_record(record, location, insert) -> SeqRecord.SeqRecord:
 	processed_features = []
 
 	#add a feature for the insert
-	processed_features.append(SeqFeature(location=FeatureLocation(location.start,location.end + seq_diff, strand=location.strand), type="protein", qualifiers={'label':insert.id}))
+	processed_features.append(SeqFeature(location=FeatureLocation(location.start,location.end + seq_diff, strand=location.strand), type="protein", qualifiers={'label':[insert.name]}))
 
 	for feat in record.features:
 
@@ -197,7 +197,7 @@ def make_naive_vector_records(base_vector_record, protein_filepaths) -> Generato
 				vec_name = intermediate_vector_record.name
 				insert_name = insert.name
 				intermediate_vector_record.name = f"{insert_name}__{vec_name}"
-				yield 
+				yield intermediate_vector_record
 		else:
 			intermediate_vector_record = copy.deepcopy(base_vector_record)
 			for insert in inserts:

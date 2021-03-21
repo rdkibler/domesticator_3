@@ -19,7 +19,7 @@ FEATURES             Location/Qualifiers
                      /label="start"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
-     tag             89..802
+     protein         89..802
                      /label="sfGFP"
                      /ApEinfo_revcolor=#b1ff67
                      /ApEinfo_fwdcolor=#b1ff67
@@ -31,12 +31,10 @@ FEATURES             Location/Qualifiers
                      /label="IDT Insertion F"
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
-     peptide         809..826
+     protein         809..826
                      /label="TEV"
                      /ApEinfo_revcolor=#84b0dc
                      /ApEinfo_fwdcolor=#84b0dc
-     CDS             809..826
-                     /label="Translation 809-826"
      misc_feature    827..1243
                      /label="@AvoidPattern(CCCCCC)"
                      /ApEinfo_revcolor=#d6b295
@@ -45,7 +43,6 @@ FEATURES             Location/Qualifiers
                      /label="@AvoidPattern(AAAAAA)"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
-
      misc_feature    827..1243
                      /label="@EnforceGCContent(40-65%)"
                      /ApEinfo_revcolor=#d6b295
@@ -85,8 +82,6 @@ FEATURES             Location/Qualifiers
                      /label="@AvoidChanges()"
                      /ApEinfo_revcolor=#ffef86
                      /ApEinfo_fwdcolor=#ffef86
-     CDS             888..908
-                     /label="Translation 888-908"
      misc_feature    891..908
                      /label="RBS"
                      /ApEinfo_revcolor=#ffef86
@@ -99,7 +94,6 @@ FEATURES             Location/Qualifiers
                      /label="!insert(B)"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
-
      misc_feature    967..987
                      /label="@AvoidChanges()"
                      /ApEinfo_revcolor=#f58a5e
@@ -114,15 +108,15 @@ FEATURES             Location/Qualifiers
                      /label="start"
                      /ApEinfo_revcolor=#b4abac
                      /ApEinfo_fwdcolor=#b4abac
-     misc_feature    994..1011
-                     /label="6x His Tag"
+     protein         994..1011
+                     /label="His6"
                      /ApEinfo_revcolor=#f58a5e
                      /ApEinfo_fwdcolor=#f58a5e
-     misc_feature    1027..1146
+     protein         1027..1146
                      /label="EHEE"
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
-     misc_feature    1162..1179
+     protein         1162..1179
                      /label="TEV"
                      /ApEinfo_revcolor=#f58a5e
                      /ApEinfo_fwdcolor=#f58a5e
@@ -142,7 +136,7 @@ FEATURES             Location/Qualifiers
                      /label="IDT Insertion R"
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
-     misc_feature    1250..1267
+     protein         1250..1267
                      /label="6xHis"
                      /ApEinfo_revcolor=#faac61
                      /ApEinfo_fwdcolor=#faac61
