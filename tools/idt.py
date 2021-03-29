@@ -29,19 +29,19 @@ def parse_user_args():
 def ask_for_user_data(user_info_file):
 	user_info = {}
 	idt_url = "https://www.idtdna.com/pages/tools/apidoc"
-	msg = "The first time you use the IDT " \
-		"complexity function requires you to " \
-		"input your IDT username, password, " \
-		"API client ID and API client secret. "\
-		"These will be stored securely in " \
+	msg = f"The first time you use the IDT " \
+		f"complexity function requires you to " \
+		f"input your IDT username, password, " \
+		f"API client ID and API client secret. "\
+		f"These will be stored securely in " \
 		f"'{os.path.abspath(user_info_file)}', " \
-		"which only you have access to. Before " \
-		"you begin, go to {idt_url} and follow " \
-		"all the directions under the 'Get " \
-		"access to the API' header. The client " \
-		"ID and client description can be " \
-		"anything. The client secret will be " \
-		"generated for you."
+		f"which only you have access to. Before " \
+		f"you begin, go to {idt_url} and follow " \
+		f"all the directions under the 'Get " \
+		f"access to the API' header. The client " \
+		f"ID and client description can be " \
+		f"anything. The client secret will be " \
+		f"generated for you."
 
 	print(msg)
 	print("1) Please enter your IDT account username: ")
@@ -116,6 +116,8 @@ def get_new_token(user_info, verbose=False):
 			vprint("token acquired",verbose)
 			break
 		else:
+			for key in response_dict.keys():
+				print(key, ":", response_dict[key])
 			vprint(f"ERROR: {response_dict['Message']}\nTrying again in 5 seconds...",verbose)
 			time.sleep(5)
 	if "access_token" not in response_dict:
