@@ -27,6 +27,7 @@ import copy
 from dnachisel import DnaOptimizationProblem, NoSolutionError
 from dnachisel import DEFAULT_SPECIFICATIONS_DICT
 import Bio
+from Bio.Seq import Seq
 import numpy as np
 import pandas as pd
 
@@ -78,7 +79,6 @@ for record in naive_vector_records:
 					seq = feature.extract(sol_record.seq)
 					break
 			assert seq != ""
-
 			idt_token = idt.get_token(idt.token_file,idt_user_info)
 			response = idt.query_complexity(seq,idt_token["access_token"])
 			# if len(response[0]) == 0:
@@ -105,7 +105,10 @@ print("REPORT")
 records_to_synthesize = []
 all_protein_params = []
 for optimized_vector_solution in optimized_vector_solutions:
+	#optimized_vector_solution.record stores the NAIVE RECORD, so we need to use to_record()
+	#however I think the annotations to the generated record (from to_record()) are bad, so instead let's just transplant the sequence
 	optimized_vector_record = optimized_vector_solution.record
+	optimized_vector_record.seq = Seq(optimized_vector_solution.sequence)
 
 	Bio.SeqIO.write(optimized_vector_record, optimized_vector_record.name + ".gb","genbank")
 
@@ -116,7 +119,7 @@ for optimized_vector_solution in optimized_vector_solutions:
 				break
 	assert fragment_to_synthesize != ""
 	record_to_synthesize = Bio.SeqRecord.SeqRecord(seq=fragment_to_synthesize,id=optimized_vector_record.name,name=optimized_vector_record.name,description="")
-	
+
 	records_to_synthesize.append(record_to_synthesize)
 
 	with open(optimized_vector_record.name + ".log",'w') as f:
