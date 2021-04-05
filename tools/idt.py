@@ -9,12 +9,17 @@ import argparse
 
 idt_dir="~/.domesticator"
 
-user_info_file = os.path.expanduser(os.path.join(idt_dir + "info.json"))
-token_file = os.path.expanduser(os.path.join(idt_dir + "token.json"))
+user_info_file = os.path.expanduser(os.path.join(idt_dir, "info.json"))
+token_file = os.path.expanduser(os.path.join(idt_dir, "token.json"))
 
 
 def vprint(str,verbose=False,**kwargs):
 	if verbose: print(str,**kwargs)
+
+def use_dir(dir):
+	user_info_file = os.path.expanduser(os.path.join(dir, "info.json"))
+	token_file = os.path.expanduser(os.path.join(dir, "token.json"))
+	return user_info_file, token_file
 
 def ask_for_user_data(user_info_file):
 	user_info = {}
@@ -133,7 +138,7 @@ def get_token(token_file, user_info,verbose=False):
                 get_token_flag = True
 
 	if get_token_flag:
-                token = get_new_token(user_info)
+                token = get_new_token(user_info,verbose)
                 vprint(f"storing token at {token_file}",verbose)
                 store_token(token,token_file)
 	return token

@@ -1,4 +1,4 @@
-LOCUS       pet-29b_ntgfptev_v1-6   6040 bp ds-DNA     circular     21-MAR-2021
+LOCUS       pET29b_ntGFPtev_noCtHis 6040 bp ds-DNA     circular     21-MAR-2021
 DEFINITION  .
 ACCESSION   urn.local...1e-7x9848a                                             
 VERSION     urn.local...1e-7x9848a                                             
@@ -8,7 +8,7 @@ FEATURES             Location/Qualifiers
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
      misc_feature    1..829
-                     /label="@AvoidChanges"
+                     /label="@AvoidChanges()"
                      /ApEinfo_revcolor=#84b0dc
                      /ApEinfo_fwdcolor=#84b0dc
      misc_binding    20..42
@@ -40,25 +40,37 @@ FEATURES             Location/Qualifiers
                      /ApEinfo_revcolor=#84b0dc
                      /ApEinfo_fwdcolor=#84b0dc
      misc_feature    827..890
-                     /label="@AvoidPattern(GGGGGG)"
-                     /ApEinfo_revcolor=#faac61
-                     /ApEinfo_fwdcolor=#faac61
+                     /label="@AvoidHairpins()"
+                     /ApEinfo_revcolor=#d59687
+                     /ApEinfo_fwdcolor=#d59687
+     misc_feature    827..890
+                     /label="~use_best_codon(e_coli)"
+                     /ApEinfo_revcolor=#85dae9
+                     /ApEinfo_fwdcolor=#85dae9
+     misc_feature    827..890
+                     /label="~MinimizeNumKmers(8, boost=10)"
+                     /ApEinfo_revcolor=#c6c9d1
+                     /ApEinfo_fwdcolor=#c6c9d1
+     domesticator    827..890
+                     /label="synthesize"
+                     /ApEinfo_revcolor=#d6b295
+                     /ApEinfo_fwdcolor=#d6b295
      misc_feature    827..890
                      /label="@EnforceGCContent(40-65%)"
                      /ApEinfo_revcolor=#d6b295
                      /ApEinfo_fwdcolor=#d6b295
      misc_feature    827..890
+                     /label="@EnforceGCContent(25-80%/50bp)"
+                     /ApEinfo_revcolor=#9eafd2
+                     /ApEinfo_fwdcolor=#9eafd2
+     misc_feature    827..890
                      /label="@AvoidPattern(TTTTTT)"
                      /ApEinfo_revcolor=#faac61
                      /ApEinfo_fwdcolor=#faac61
      misc_feature    827..890
-                     /label="~MinimizeNumKmers(8, boost=10)"
-                     /ApEinfo_revcolor=#c6c9d1
-                     /ApEinfo_fwdcolor=#c6c9d1
-     misc_feature    827..890
-                     /label="@AvoidHairpins()"
-                     /ApEinfo_revcolor=#d59687
-                     /ApEinfo_fwdcolor=#d59687
+                     /label="@AvoidPattern(GGGGGG)"
+                     /ApEinfo_revcolor=#faac61
+                     /ApEinfo_fwdcolor=#faac61
      misc_feature    827..890
                      /label="@AvoidPattern(CCCCCC)"
                      /ApEinfo_revcolor=#d6b295
@@ -67,24 +79,12 @@ FEATURES             Location/Qualifiers
                      /label="@AvoidPattern(AAAAAA)"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
-     domesticator    827..890
-                     /label="synthesize"
-                     /ApEinfo_revcolor=#d6b295
-                     /ApEinfo_fwdcolor=#d6b295
-     misc_feature    827..890
-                     /label="@EnforceGCContent(25-80%/50bp)"
-                     /ApEinfo_revcolor=#9eafd2
-                     /ApEinfo_fwdcolor=#9eafd2
-     misc_feature    827..890
-                     /label="~use_best_codon(e_coli)"
-                     /ApEinfo_revcolor=#85dae9
-                     /ApEinfo_fwdcolor=#85dae9
      misc_feature    830..887
                      /label="!insert(A)"
                      /ApEinfo_revcolor=#ff9ccd
                      /ApEinfo_fwdcolor=#ff9ccd
      misc_feature    888..6040
-                     /label="@AvoidChanges"
+                     /label="@AvoidChanges()"
                      /ApEinfo_revcolor=#84b0dc
                      /ApEinfo_fwdcolor=#84b0dc
      misc_feature    complement(891..920)

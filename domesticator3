@@ -40,8 +40,8 @@ DEFAULT_SPECIFICATIONS_DICT['MinimizeNumKmers'] = MinimizeNumKmers
 
 ###### load files ######
 if not args.no_idt:
+	idt.user_info_file, idt.token_file = idt.use_dir(args.idt_credentials_dir)
 	idt_user_info = idt.get_user_info(idt.user_info_file)
-	#idt_user_info = idt.get_user_info(args.idt_credentials_dir)
 
 base_vector_record = input_parsing.load_vector_record(args.vector)
 naive_vector_records = input_parsing.make_naive_vector_records(base_vector_record,args.proteins)
