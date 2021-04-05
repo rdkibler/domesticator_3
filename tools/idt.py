@@ -7,24 +7,14 @@ import requests
 import base64
 import argparse
 
-user_info_file = os.path.expanduser("~/.domesticator/info.json")
-token_file = os.path.expanduser("~/.domesticator/token.json")
+idt_dir="~/.domesticator"
+
+user_info_file = os.path.expanduser(os.path.join(idt_dir + "info.json"))
+token_file = os.path.expanduser(os.path.join(idt_dir + "token.json"))
+
 
 def vprint(str,verbose=False,**kwargs):
 	if verbose: print(str,**kwargs)
-
-def parse_user_args():
-	parser=argparse.ArgumentParser(prog='idt complexity api')
-
-	parser.add_argument('seqs', nargs='*', help="supply a space separated DNA sequences to query")
-	parser.add_argument("--interactive",default=False,action="store_true")
-	parser.add_argument('--store_token',default=False,action="store_true")
-	parser.add_argument("--new_token",default=False,action="store_true")
-	parser.add_argument("--delete_token",default=False,action="store_true")
-	parser.add_argument("--reset_user_info",default=False,action="store_true")
-	parser.add_argument("--verbose",default=False,action="store_true")
-
-	return parser.parse_args()
 
 def ask_for_user_data(user_info_file):
 	user_info = {}
@@ -162,63 +152,6 @@ def query_complexity(seq, token,verbose=False):
 
 	return json.loads(response.text)
 
-def main():
-	args = parse_user_args()
-
-	if args.reset_user_info:
-		vprint(f"deleting {user_info_file}",args.verbose)
-		os.remove(user_info_file)
-
-	vprint("getting user info",args.verbose)
-	user_info = get_user_info(user_info_file)
-
-	if args.delete_token:
-		vprint(f"deleting token stored at {token_file}",args.verbose)
-		delete_stored_token(token_file)
-		exit("token deleted")
-
-	if args.new_token:
-		token = get_new_token(user_info, args.verbose)
-	else:
-		token = get_token(token_file, user_info, args.verbose)
-
-	if args.store_token:
-		vprint(f"storing token at {token_file}",args.verbose)
-		store_token(token,token_file)
-
-	if args.interactive:
-		while(True):
-			print("input a DNA sequence or hit return without typing anything else to exit")
-			seq = input()
-			if seq == "":
-				break
-			response = query_complexity(seq,token["access_token"])
-			if len(response[0]) == 0:
-				print("no issue!")
-			score_sum = 0
-			for issue in response[0]:
-				vprint(issue,args.verbose)
-				print(issue["Score"],issue["Name"])
-				score_sum += issue["Score"]
-			print(f"Total Score: {score_sum}")
-
-
-	else:
-		for seq in args.seqs:
-			response = query_complexity(seq,token["access_token"])
-			if len(response[0]) == 0:
-				print("no issue!")
-			score_sum = 0
-			for issue in response[0]:
-				vprint(issue,args.verbose)
-				print(issue["Score"],issue["Name"])
-				score_sum += issue["Score"]
-			print(f"Total Score: {score_sum}")
-
-
-
-if __name__ == "__main__":
-	main()
 """
 Accepted - Moderate Complexity (Scores between 7 and 19)
 

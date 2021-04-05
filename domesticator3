@@ -13,7 +13,7 @@ parser.add_argument("vector", type=str, help="A genbank (.gb) file containing an
 parser.add_argument("--nstruct", type=int, default=10, help="number of times to repeat optimization before picking one to return. Default: %(default)d")
 parser.add_argument("--max_tries", type=int, default=3, help="number of times to restart optimization before giving up if no solution is found. Default: %(default)d")
 parser.add_argument("--no_idt",action="store_true",help="Turn off complexity checking using IDT's API")
-parser.add_argument("--idt_credentials",type=str,default = "/home/rdkibler/projects/dom_dev/lab_shared_idt_creds.json", help="A path to the place to search for you stored IDT API credentials. If no file is found, then you will be prompted to enter new ones and they will be stored there")
+parser.add_argument("--idt_credentials_dir",type=str,default = "/home/rdkibler/projects/dom_dev/lab_shared_idt_creds", help="A path to the place to search for you stored IDT API credentials. If no info.json file is found, then you will be prompted to enter new ones and they will be stored there")
 
 parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
 
@@ -40,8 +40,8 @@ DEFAULT_SPECIFICATIONS_DICT['MinimizeNumKmers'] = MinimizeNumKmers
 
 ###### load files ######
 if not args.no_idt:
-	#idt_user_info = idt.get_user_info(idt.user_info_file)
-	idt_user_info = idt.get_user_info(args.idt_credentials)
+	idt_user_info = idt.get_user_info(idt.user_info_file)
+	#idt_user_info = idt.get_user_info(args.idt_credentials_dir)
 
 base_vector_record = input_parsing.load_vector_record(args.vector)
 naive_vector_records = input_parsing.make_naive_vector_records(base_vector_record,args.proteins)
