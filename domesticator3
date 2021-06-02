@@ -14,6 +14,7 @@ parser.add_argument("--nstruct", type=int, default=10, help="number of times to 
 parser.add_argument("--max_tries", type=int, default=3, help="number of times to restart optimization before giving up if no solution is found. Default: %(default)d")
 parser.add_argument("--no_idt",action="store_true",help="Turn off complexity checking using IDT's API")
 parser.add_argument("--idt_credentials_dir",type=str,default = "/home/rdkibler/projects/dom_dev/lab_shared_idt_creds", help="A path to the place to search for you stored IDT API credentials. If no info.json file is found, then you will be prompted to enter new ones and they will be stored there")
+parser.add_argument("--no_opt", action="store_true",help="bypass the gene optimization step. Useful for debugging new vectors")
 
 parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
 
@@ -51,7 +52,9 @@ optimized_vector_solutions = []
 for record in naive_vector_records:
 	print(f"Attempting optimization of {record.name}")
 	initial_problem = DnaOptimizationProblem.from_record(record)
-	# print(dir(initial_problem))
+	if args.no_opt:
+		optimized_vector_solutions.append(initial_problem)
+		continue
 	solutions = []
 	iteration = 0
 	trial = 0
