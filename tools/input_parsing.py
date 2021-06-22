@@ -50,11 +50,13 @@ def load_inserts(filenames) -> Generator[SeqRecord.SeqRecord,None,None]:
 		assert ext in ['.pdb','.fasta']
 
 		if ext == '.fasta':
+			records = []
 			for record in SeqIO.parse(filename, 'fasta'):
 				orig_aa_seq = record.seq
 				new_dna_seq = Seq(reverse_translate(record.seq))
 				assert(orig_aa_seq == new_dna_seq.translate())
-				yield [SeqRecord.SeqRecord(seq=new_dna_seq,id=record.id,name=record.name,description=record.description,annotations={"molecule_type": "DNA", "chain":"A"})]
+				records.append(SeqRecord.SeqRecord(seq=new_dna_seq,id=record.id,name=record.name,description=record.description,annotations={"molecule_type": "DNA", "chain":"A"}))
+			yield records
 		else:
 			records = []
 			with warnings.catch_warnings(): 
