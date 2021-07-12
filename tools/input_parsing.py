@@ -140,8 +140,14 @@ def replace_sequence_in_record(record, location, insert) -> SeqRecord.SeqRecord:
 			elif subloc.start == location.start and subloc.end == location.end:
 				new_loc = FeatureLocation(location.start, location.end + seq_diff, strand=subloc.strand)
 
-			#type 2: where they start or end inside the location
-			#I assume that the total length of the annotation is important, so adjust the annotation to have the correct
+			#type 2a: where they span the location but start or end at the start or end of the location 
+			elif subloc.start == location.start and subloc.end > location.end:
+				new_loc = FeatureLocation(location.start, subloc.end + seq_diff, strand=subloc.strand)
+			elif subloc.start < location.start and subloc.end == location.end:
+				new_loc = FeatureLocation(subloc.start, location.end + seq_diff, strand=subloc.strand)
+
+			#type 2b: where they start or end inside the location but don't fully span the location
+			#Here I assume that the total length of the annotation is important, so adjust the annotation to have the correct
 			# length anchored outside of the insert, unless it'd extend through the insert
 			elif subloc.start >= location.start and subloc.start <= location.end:
 				#we already caught the case where it's fully within, so I know the end of the subloc extends after the end of the insert 
