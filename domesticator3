@@ -16,6 +16,7 @@ parser.add_argument("--nstruct", type=int, default=10, help="number of times to 
 parser.add_argument("--max_tries", type=int, default=3, help="number of times to restart optimization before giving up if no solution is found. Default: %(default)d")
 parser.add_argument("--no_idt",action="store_true",help="Turn off complexity checking using IDT's API")
 parser.add_argument("--idt_credentials_dir",type=str,default = "/home/rdkibler/projects/dom_dev/lab_shared_idt_creds", help="A path to the place to search for you stored IDT API credentials. If no info.json file is found, then you will be prompted to enter new ones and they will be stored there")
+parser.add_argument("--idt_threshold",type=float,default=7,help="automatically accept the first solution with IDT score under this threshold")
 parser.add_argument("--no_opt", action="store_true",help="bypass the gene optimization step. Useful for debugging new vectors")
 
 parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
@@ -58,7 +59,11 @@ for record in naive_vector_records:
 		optimized_vector_solutions.append(initial_problem)
 		continue
 	solutions = []
+	idt_scores = []
+	solution_found = False
 	for iteration in range(args.nstruct):
+		if solution_found:
+			break
 		trial = 0
 		while trial < args.max_tries:
 			try:
@@ -73,14 +78,16 @@ for record in naive_vector_records:
 				print("no solution found. Retrying...")
 				initial_problem.max_random_iters += 1000
 				trial += 1
+				continue
+
 		if trial == args.max_tries:
 			print("Skipping...")
+			continue
 
-
-	if not args.no_idt:
-		print("querying IDT")
-		idt_scores = []
-		for i,solution in enumerate(solutions):
+		if not args.no_idt:
+			print("querying IDT")
+			i = len(solutions)
+			solution = solutions[-1]
 			sol_record = solution.to_record()
 			seq = ""
 			for feature in sol_record.features:
@@ -91,15 +98,45 @@ for record in naive_vector_records:
 			idt_token = idt.get_token(idt.token_file,idt_user_info)
 			response = idt.query_complexity(seq,idt_token["access_token"])
 			# if len(response[0]) == 0:
-			# 	print("no issue!")
+			#       print("no issue!")
 			score_sum = 0
 			print(f"SOLUTION {i+1}:")
 			for issue in response[0]:
-				print(issue["Score"],issue["Name"])
-				score_sum += issue["Score"]
+					print(issue["Score"],issue["Name"])
+					score_sum += issue["Score"]
 			print(f"Total Score: {score_sum}")
 			print()
 			idt_scores.append(score_sum)
+			if score_sum < args.idt_threshold:
+				print("accept")
+				solution_found = True
+				break
+
+
+
+	if not args.no_idt:
+#		print("querying IDT")
+#		idt_scores = []
+#		for i,solution in enumerate(solutions):
+#			sol_record = solution.to_record()
+#			seq = ""
+#			for feature in sol_record.features:
+#				if feature.type == "domesticator" and feature.qualifiers['label'] == ["synthesize"]:
+#					seq = feature.extract(sol_record.seq)
+#					break
+#			assert seq != ""
+#			idt_token = idt.get_token(idt.token_file,idt_user_info)
+#			response = idt.query_complexity(seq,idt_token["access_token"])
+#			# if len(response[0]) == 0:
+#			# 	print("no issue!")
+#			score_sum = 0
+#			print(f"SOLUTION {i+1}:")
+#			for issue in response[0]:
+#				print(issue["Score"],issue["Name"])
+#				score_sum += issue["Score"]
+#			print(f"Total Score: {score_sum}")
+#			print()
+#			idt_scores.append(score_sum)
 
 		best_idx = np.argmin(idt_scores)
 	else:
