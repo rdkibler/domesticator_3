@@ -10,6 +10,8 @@ parser = argparse.ArgumentParser(prog='domesticator3', description='A sophistica
 parser.add_argument("proteins", type=str, nargs="+", help="Either one or more fasta files containing one or more protein sequences or one or more pdb files")
 parser.add_argument("vector", type=str, help="A genbank (.gb) file containing annotations in the domesticator format to control domesticator function")
 
+parser.add_argument("--single_protein_fasta", action="store_true",help="Assign increasing chain letters in the order that they appear in the file. Lettering resets between files. This is useful for multiple insertions with a fasta file")
+
 parser.add_argument("--nstruct", type=int, default=10, help="number of times to repeat optimization before picking one to return. Default: %(default)d")
 parser.add_argument("--max_tries", type=int, default=3, help="number of times to restart optimization before giving up if no solution is found. Default: %(default)d")
 parser.add_argument("--no_idt",action="store_true",help="Turn off complexity checking using IDT's API")
@@ -45,7 +47,7 @@ if not args.no_idt:
 	idt_user_info = idt.get_user_info(idt.user_info_file)
 
 base_vector_record = input_parsing.load_vector_record(args.vector)
-naive_vector_records = input_parsing.make_naive_vector_records(base_vector_record,args.proteins)
+naive_vector_records = input_parsing.make_naive_vector_records(base_vector_record,args.proteins,args.single_protein_fasta)
 
 ###### optimize ######
 optimized_vector_solutions = []

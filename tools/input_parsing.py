@@ -27,7 +27,7 @@ def load_vector_record(vector_filepath) -> SeqRecord.SeqRecord:
 
 
 
-def load_inserts(filenames) -> Generator[SeqRecord.SeqRecord,None,None]:
+def load_inserts(filenames,increasing_chain_fasta) -> Generator[SeqRecord.SeqRecord,None,None]:
 	""" yields Biopython SeqRecord.SeqRecords
 
 	A generator function which always returns a list of SeqRecords holding DNA 
@@ -42,7 +42,7 @@ def load_inserts(filenames) -> Generator[SeqRecord.SeqRecord,None,None]:
 
 	rdkibler 210320
 	"""
-
+	alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	for filename in filenames: 
 		assert os.path.isfile(filename)
 		basename = os.path.basename(filename)
@@ -51,11 +51,13 @@ def load_inserts(filenames) -> Generator[SeqRecord.SeqRecord,None,None]:
 
 		if ext == '.fasta':
 			records = []
-			for record in SeqIO.parse(filename, 'fasta'):
+			for chain_num,record in enumerate(SeqIO.parse(filename, 'fasta')):
+				if not increasing_chain_fasta:
+					chain_num = 0
 				orig_aa_seq = record.seq
 				new_dna_seq = Seq(reverse_translate(record.seq))
 				assert(orig_aa_seq == new_dna_seq.translate())
-				new_record = SeqRecord.SeqRecord(seq=new_dna_seq,id=record.id,name=record.id,description=record.description,annotations={"molecule_type": "DNA", "chain":"A"})
+				new_record = SeqRecord.SeqRecord(seq=new_dna_seq,id=record.id,name=record.id,description=record.description,annotations={"molecule_type": "DNA", "chain":alphabet[chain_num]})
 				records.append(new_record)
 			yield records
 		else:
@@ -186,7 +188,7 @@ def replace_sequence_in_record(record, location, insert) -> SeqRecord.SeqRecord:
 	return record
 
 
-def make_naive_vector_records(base_vector_record, protein_filepaths) -> Generator[SeqRecord.SeqRecord,None,None]:
+def make_naive_vector_records(base_vector_record, protein_filepaths,increasing_chain_fasta=False) -> Generator[SeqRecord.SeqRecord,None,None]:
 	""" yields Biopython SeqRecord.SeqRecords
 
 	A generator which loads the proteins, randomly reverse translates each one, inserts them into the vectors.
@@ -197,7 +199,7 @@ def make_naive_vector_records(base_vector_record, protein_filepaths) -> Generato
 
 	insert_locations = get_insert_locations(base_vector_record)
 	#print(insert_locations)
-	for inserts in load_inserts(protein_filepaths):
+	for inserts in load_inserts(protein_filepaths,increasing_chain_fasta):
 
 		if len(insert_locations) == 1:
 			for insert in inserts:
