@@ -56,18 +56,18 @@ def find_polypeptides(vector_record) -> list:
 			translation_end = translation_start + translation_length
 			name = ""
 			features_for_naming = []
+
 			for feature2 in vector_record.features:
 				if feature2.type == "protein" \
 				and feature2.location.start >= translation_start \
 				and feature2.location.start < translation_end \
 				and feature2.location.end > translation_start \
-				and feature2.location.end <=translation_end:
+				and feature2.location.end <=translation_end+3: #the +3 helps it detect stop codons
 					features_for_naming.append(feature2)
 
 			features_for_naming.sort(key=lambda x: x.location.start)
 
 			name = "-".join([feat.qualifiers['label'][0] for feat in features_for_naming])
-
 			pp.name = name
 
 			found_polypeptides.append(pp)

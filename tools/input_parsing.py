@@ -55,7 +55,8 @@ def load_inserts(filenames) -> Generator[SeqRecord.SeqRecord,None,None]:
 				orig_aa_seq = record.seq
 				new_dna_seq = Seq(reverse_translate(record.seq))
 				assert(orig_aa_seq == new_dna_seq.translate())
-				records.append(SeqRecord.SeqRecord(seq=new_dna_seq,id=record.id,name=record.name,description=record.description,annotations={"molecule_type": "DNA", "chain":"A"}))
+				new_record = SeqRecord.SeqRecord(seq=new_dna_seq,id=record.id,name=record.id,description=record.description,annotations={"molecule_type": "DNA", "chain":"A"})
+				records.append(new_record)
 			yield records
 		else:
 			records = []
