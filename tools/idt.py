@@ -157,6 +157,30 @@ def query_complexity(seq, token,verbose=False):
 
 	return json.loads(response.text)
 
+if __name__ == "__main__":
+	import argparse
+	from Bio import SeqIO
+
+	parser = argparse.ArgumentParser()
+	parser.add_argument("fasta", type=str, help="A fasta file containing the sequences you want to check for complexity")
+	parser.add_argument("--credential_dir", default="~/.domesticator")
+	args = parser.parse_args()
+
+	user_info_file, token_file = use_dir(args.credential_dir)
+	idt_user_info = get_user_info(user_info_file)
+
+
+	for record in SeqIO.parse(args.fasta,"fasta"):
+		token = get_token(token_file, idt_user_info)
+		response = query_complexity(record.seq, token["access_token"])[0]
+		score = 0
+		if len(response) == 0:
+			score = 0
+		else:
+			for issue in response:
+				score += issue["Score"]
+		print(record.id,record.seq,score)
+
 """
 Accepted - Moderate Complexity (Scores between 7 and 19)
 
