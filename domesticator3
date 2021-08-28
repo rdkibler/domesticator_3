@@ -58,23 +58,25 @@ for record in naive_vector_records:
 		optimized_vector_solutions.append(initial_problem)
 		continue
 	solutions = []
-	iteration = 0
-	trial = 0
-	while iteration < args.nstruct and trial < args.max_tries:
-		try:
-			print(f"iteration {iteration + 1}/{args.nstruct}")
-			problem = copy.deepcopy(initial_problem)
-			problem.resolve_constraints_by_random_mutations()
-			problem.optimize()
-			problem.resolve_constraints(final_check=True)
-			solutions.append(problem)
-			iteration += 1
-		except NoSolutionError:
-			print("no solution found. Retrying...")
-			initial_problem.max_random_iters += 1000
-			trial += 1
+	for iteration in range(args.nstruct):
+		trial = 0
+		while trial < args.max_tries:
+			try:
+				print(f"iteration {iteration + 1}/{args.nstruct}")
+				problem = copy.deepcopy(initial_problem)
+				problem.resolve_constraints_by_random_mutations()
+				problem.optimize()
+				problem.resolve_constraints(final_check=True)
+				solutions.append(problem)
+				break
+			except NoSolutionError:
+				print("no solution found. Retrying...")
+				initial_problem.max_random_iters += 1000
+				trial += 1
+		if trial == args.max_tries:
+			print("Skipping...")
 
-	
+
 	if not args.no_idt:
 		print("querying IDT")
 		idt_scores = []
