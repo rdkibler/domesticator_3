@@ -115,29 +115,6 @@ for record in naive_vector_records:
 
 
 	if not args.no_idt:
-#		print("querying IDT")
-#		idt_scores = []
-#		for i,solution in enumerate(solutions):
-#			sol_record = solution.to_record()
-#			seq = ""
-#			for feature in sol_record.features:
-#				if feature.type == "domesticator" and feature.qualifiers['label'] == ["synthesize"]:
-#					seq = feature.extract(sol_record.seq)
-#					break
-#			assert seq != ""
-#			idt_token = idt.get_token(idt.token_file,idt_user_info)
-#			response = idt.query_complexity(seq,idt_token["access_token"])
-#			# if len(response[0]) == 0:
-#			# 	print("no issue!")
-#			score_sum = 0
-#			print(f"SOLUTION {i+1}:")
-#			for issue in response[0]:
-#				print(issue["Score"],issue["Name"])
-#				score_sum += issue["Score"]
-#			print(f"Total Score: {score_sum}")
-#			print()
-#			idt_scores.append(score_sum)
-
 		best_idx = np.argmin(idt_scores)
 	else:
 		scores = [solution.objectives_evaluations().scores_sum() for solution in solutions]
