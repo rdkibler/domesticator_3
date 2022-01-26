@@ -1,0 +1,16 @@
+LOCUS       fragment                 129 bp ds-DNA     circular     18-JAN-2022
+DEFINITION  .
+ACCESSION   urn.local...1e-7x9848a                                             
+VERSION     urn.local...1e-7x9848a                                             
+FEATURES             Location/Qualifiers
+     domesticator    1..129
+                     /label="synthesize"
+     misc_feature    1..129
+                     /label="!insert(A)"
+     CDS             1..129
+                     /label="Translation 1-129"
+ORIGIN
+        1 aaagaaaccg ctgctgctaa attcgaacgc cagcacatgg acagcccaga tctgggtacc
+       61 ctggtgccac gcggttccat ggcgatatcg gatccgaatt cgagctccgt cgacaagctt
+      121 gcggccgca
+//
