@@ -18,6 +18,7 @@ parser.add_argument("--no_idt",action="store_true",help="Turn off complexity che
 parser.add_argument("--idt_credentials_dir",type=str,default = "/home/rdkibler/projects/dom_dev/lab_shared_idt_creds", help="A path to the place to search for you stored IDT API credentials. If no info.json file is found, then you will be prompted to enter new ones and they will be stored there")
 parser.add_argument("--idt_threshold",type=float,default=7,help="automatically accept the first solution with IDT score under this threshold")
 parser.add_argument("--no_opt", action="store_true",help="bypass the gene optimization step. Useful for debugging new vectors")
+parser.add_argument("--ramp_kmers_boost", type=float, default=0, help="increase the boost of the kmers objective after each failed optimization. Default: %(default)f")
 
 parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
 
@@ -110,6 +111,13 @@ for record in naive_vector_records:
 			if score_sum < args.idt_threshold:
 				print("accept")
 				solution_found = True
+				break
+		
+		#find the avoid_kmers objective
+		for objective in initial_problem.objectives:
+			if type(objective) == MinimizeNumKmers:
+				objective.boost = objective.boost + args.ramp_kmers_boost
+				print(f"DEBUG! boosting {str(objective)} by {args.ramp_kmers_boost}. Value is now {objective.boost}")
 				break
 
 
