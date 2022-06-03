@@ -31,7 +31,7 @@ FEATURES             Location/Qualifiers
                      /ApEinfo_revcolor=#ffef86
                      /ApEinfo_fwdcolor=#ffef86
      misc_feature    92..220
-                     /label="@AvoidHairpins() & @AvoidPattern(RRRRRNNNNNDTG) & AvoidPattern(RRRRRNNNNNNDTG) & AvoidPattern(RRRRRNNNNNNNDTG) & @AvoidPattern(AAAAAA) & @AvoidPattern(CCCCCC) & @AvoidPattern(GGGGGG) & @AvoidPattern(TTTTTT) & @EnforceGCContent(25-80%/50bp) & @EnforceGCContent(40-65%) & ~MinimizeNumKmers(8, boost=10) & ~use_best_codon(e_coli)"
+                     /label="@AvoidHairpins() & @AvoidPattern(RRRRRNNNNNDTG) & @AvoidPattern(RRRRRNNNNNNDTG) & @AvoidPattern(RRRRRNNNNNNNDTG) & @AvoidPattern(AAAAAA) & @AvoidPattern(CCCCCC) & @AvoidPattern(GGGGGG) & @AvoidPattern(TTTTTT) & @EnforceGCContent(25-80%/50bp) & @EnforceGCContent(40-65%) & ~MinimizeNumKmers(8, boost=10) & ~use_best_codon(e_coli)"
                      /ApEinfo_revcolor=#c6c9d1
                      /ApEinfo_fwdcolor=#c6c9d1
      domesticator    92..220
