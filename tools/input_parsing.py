@@ -79,8 +79,8 @@ def load_inserts(
             for chain_num, record in enumerate(SeqIO.parse(filename, "fasta")):
                 if not increasing_chain_fasta:
                     chain_num = 0
-                orig_aa_seq = record.seq
-                new_dna_seq = Seq(reverse_translate(record.seq))
+                orig_aa_seq = record.seq.upper()
+                new_dna_seq = Seq(reverse_translate(record.seq.upper()))
                 assert orig_aa_seq == new_dna_seq.translate()
                 new_record = SeqRecord.SeqRecord(
                     seq=new_dna_seq,
@@ -97,8 +97,8 @@ def load_inserts(
                 warnings.filterwarnings("ignore", category=PDBConstructionWarning)
                 warnings.filterwarnings("ignore", category=BiopythonParserWarning)
                 for record in SeqIO.parse(filename, "pdb-atom"):
-                    orig_aa_seq = record.seq
-                    new_dna_seq = Seq(reverse_translate(record.seq))
+                    orig_aa_seq = record.seq.upper()
+                    new_dna_seq = Seq(reverse_translate(record.seq.upper()))
                     assert orig_aa_seq == new_dna_seq.translate()
                     new_id = name + "_" + record.annotations["chain"]
                     new_name = name + "_" + record.annotations["chain"]
