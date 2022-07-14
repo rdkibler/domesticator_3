@@ -1,0 +1,20 @@
+LOCUS       fragment                 129 bp ds-DNA     circular     11-MAR-2022
+DEFINITION  .
+ACCESSION   urn.local...1e-7x9848a                                             
+VERSION     urn.local...1e-7x9848a                                             
+FEATURES             Location/Qualifiers
+     domesticator    1..129
+                     /label="synthesize"
+     misc_feature    1..129
+                     /label="@AvoidHairpins() & @AvoidPattern(AAAAAA) & @AvoidPattern(CCCCCC) & @AvoidPattern(GGGGGG) & @AvoidPattern(TTTTTT) & @EnforceGCContent(25-80%/50bp) & @EnforceGCContent(40-65%) & ~MinimizeNumKmers(8, boost=10) & ~use_best_codon(e_coli)"
+     misc_feature    1..129
+                     /label="!insert(A)"
+     misc_feature    1..129
+                     /label="@EnforceTranslation()"
+     exon            1..129
+                     /label="Translation 1-129"
+ORIGIN
+        1 aaagaaaccg ctgctgctaa attcgaacgc cagcacatgg acagcccaga tctgggtacc
+       61 ctggtgccac gcggttccat ggcgatatcg gatccgaatt cgagctccgt cgacaagctt
+      121 gcggccgca
+//
