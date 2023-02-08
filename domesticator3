@@ -1,4 +1,4 @@
-#!/home/rdkibler/.conda/envs/michelangeneo/bin/python
+#!/net/software/lab/domesticator_3/env/michaelangeneo/bin/python3.9
 # -*- coding: utf-8 -*-
 
 ###### input handling ######
@@ -18,8 +18,10 @@ parser.add_argument("--no_idt",action="store_true",help="Turn off complexity che
 #parser.add_argument("--idt_credentials_dir",type=str,default = "/home/rdkibler/projects/dom_dev/lab_shared_idt_creds", help="A path to the place to search for you stored IDT API credentials. If no info.json file is found, then you will be prompted to enter new ones and they will be stored there")
 parser.add_argument("--idt_credentials_dir",type=str,default = "~/idt_credentials", help="A path to the place to search for you stored IDT API credentials. If no info.json file is found, then you will be prompted to enter new ones and they will be stored there")
 parser.add_argument("--idt_threshold",type=float,default=7,help="automatically accept the first solution with IDT score under this threshold")
+parser.add_argument('--idt_kind', type=str, help='kind of sequence to query', default='gene', choices = ['gene','gblock','gblock_hifi','eblock','old'])
 parser.add_argument("--no_opt", action="store_true",help="bypass the gene optimization step. Useful for debugging new vectors")
 parser.add_argument("--ramp_kmers_boost", type=float, default=0, help="increase the boost of the kmers objective after each failed optimization. Default: %(default)f")
+
 
 parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
 
@@ -98,7 +100,7 @@ for record in naive_vector_records:
 					break
 			assert seq != ""
 			idt_token = idt.get_token(idt.token_file,idt_user_info)
-			response = idt.query_complexity(seq,idt_token["access_token"])
+			response = idt.query_complexity(seq,idt_token["access_token"], args.idt_kind)
 			# if len(response[0]) == 0:
 			#       print("no issue!")
 			score_sum = 0

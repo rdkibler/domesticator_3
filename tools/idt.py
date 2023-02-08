@@ -11,11 +11,6 @@ from base64 import b64encode
 import json
 from urllib import request, parse
 
-idt_dir = "~/.domesticator"
-
-user_info_file = os.path.expanduser(os.path.join(idt_dir, "info.json"))
-token_file = os.path.expanduser(os.path.join(idt_dir, "token.json"))
-
 
 def vprint(str, verbose=False, **kwargs):
     if verbose:
@@ -100,38 +95,6 @@ def store_token(token, token_file):
         json.dump(token, f)
 
 
-# def get_new_token(user_info, verbose=False):
-# 	vprint("getting new token", verbose)
-# 	client_info = user_info["ID"]+":"+user_info["secret"]
-# 	byte_encoded_client_info = client_info.encode("utf-8")
-# 	base64_client_info = base64.urlsafe_b64encode(byte_encoded_client_info).decode('utf8')
-
-# 	url = "https://www.idtdna.com/Identityserver/connect/token"
-
-# 	payload = f'grant_type=password&username={user_info["username"]}&password={user_info["password"]}&scope=test'
-# 	headers = {
-# 		'Content-Type': 'application/x-www-form-urlencoded',
-# 		'Authorization': f'Basic {base64_client_info}'
-# 	}
-# 	tries = 5
-# 	while(tries > 0):
-# 		response = requests.request("POST", url, headers=headers, data = payload)
-
-# 		response_dict = json.loads(response.text)
-# 		tries =- 1
-# 		if "access_token" in response_dict:
-# 			vprint("token acquired",verbose)
-# 			break
-# 		else:
-# 			for key in response_dict.keys():
-# 				print(key, ":", response_dict[key])
-# 			vprint(f"ERROR: {response_dict['Message']}\nTrying again in 5 seconds...",verbose)
-# 			time.sleep(5)
-# 	if "access_token" not in response_dict:
-# 		raise RuntimeError("Could not get access token")
-# 	return response_dict
-
-
 # IDT's code, because my code is bad
 def get_new_token(user_info, verbose=False):
     """
@@ -213,9 +176,18 @@ def get_token(token_file, user_info, verbose=False):
     return token
 
 
-def query_complexity(seq, token, verbose=False):
-    vprint("querying complexity", verbose)
-    url = "https://www.idtdna.com/api/complexities/screengBlockSequences"
+def query_complexity(seq, token,verbose=False, kind='gene'):
+
+    url_dict = {}
+    url_dict['gene'] = "https://www.idtdna.com/Restapi/v1/Complexities/ScreenGeneSequences"
+    url_dict['gblock'] = "https://www.idtdna.com/Restapi/v1/Complexities/ScreenGblockSequences"
+    url_dict['gblock_hifi'] = "https://www.idtdna.com/Restapi/v1/Complexities/ScreenGblockHifiSequences"
+    url_dict['eblock'] = "https://www.idtdna.com/Restapi/v1/Complexities/ScreenEblockSequences"
+    url_dict['old'] = "https://www.idtdna.com/api/complexities/screengBlockSequences"
+
+    url = url_dict[kind]
+
+    vprint(f"querying complexity", verbose)
 
     payload = f'[{{"Name":"My gBlock","Sequence":"{seq}"}}]'
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
@@ -235,7 +207,8 @@ if __name__ == "__main__":
         type=str,
         help="A fasta file containing the sequences you want to check for complexity",
     )
-    parser.add_argument("--credential_dir", default="~/.domesticator")
+    parser.add_argument("--credential_dir", default="~/idt_credentials")
+    parser.add_argument('-k', '--kind', type=str, help='kind of sequence to query', default='gene', choices = ['gene','gblock','gblock_hifi','eblock','old'])
     args = parser.parse_args()
 
     user_info_file, token_file = use_dir(args.credential_dir)
@@ -243,7 +216,7 @@ if __name__ == "__main__":
 
     for record in SeqIO.parse(args.fasta, "fasta"):
         token = get_token(token_file, idt_user_info)
-        response = query_complexity(record.seq, token["access_token"])[0]
+        response = query_complexity(record.seq, token["access_token"], kind=args.kind)[0]
         score = 0
         if len(response) == 0:
             score = 0
