@@ -192,7 +192,43 @@ def query_complexity(seq, token,verbose=False, kind='gene'):
     payload = f'[{{"Name":"My gBlock","Sequence":"{seq}"}}]'
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
 
-    response = requests.request("POST", url, headers=headers, data=payload)
+    while True:
+        response = requests.request("POST", url, headers=headers, data=payload)
+        if response.status_code == 429:
+            print(response.text)
+            vprint("Rate limited, waiting 10 seconds", verbose)
+            time.sleep(10)
+        else:
+            break
+
+    if int(response.status_code) != 200:
+
+        print(response)
+        print(dir(response))
+        print("JSON")
+        print(response.json())
+        print("TEXT")
+        print(response.text)
+        print("CONTENT")
+        print(response.content)
+        print("STATUS_CODE", response.status_code)
+        print("HEADERS")
+        print(response.headers)
+        print("COOKIES")
+        print(response.cookies)
+        print("URL")
+        print(response.url)
+        print("HISTORY")
+        print(response.history)
+        print("ENCODING")
+        print(response.encoding)
+        print("REASON")
+        print(response.reason)
+        print("OK")
+
+        raise RuntimeError(
+            f"Request failed with error code: {response.status_code} \nBody:\n{response.text}"
+        )
 
     return json.loads(response.text)
 
