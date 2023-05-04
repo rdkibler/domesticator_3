@@ -14,7 +14,7 @@ from urllib import request, parse
 
 data_collection_basedir = "/net/shared/idt_dna/sequence_complexity_data_raw"
 
-def vprint(str, verbose=False, **kwargs):
+def vprint(str, verbose:bool=False, **kwargs):
     if verbose:
         print(str, **kwargs)
 
@@ -213,7 +213,7 @@ def get_token(user_info, verbose=False):
         store_token(token, token_file)
     return token
 
-def store_response(response_dict, seq, kind):
+def store_response(response_dict, name, seq, kind):
     date = datetime.datetime.now().strftime("%Y-%m-%d")
     timestamp = datetime.datetime.now().strftime("%H-%M-%S-%f")[:-3]
     username = os.getlogin()
@@ -227,6 +227,7 @@ def store_response(response_dict, seq, kind):
     data['username'] = username
     data['kind'] = str(kind)
     data['sequence'] = str(seq)
+    data['gene_name'] = str(name)
 
     filename = f"{timestamp}.json"
     filepath = os.path.join(data_collection_dir, filename)
@@ -236,7 +237,7 @@ def store_response(response_dict, seq, kind):
 
 
 
-def query_complexity(seq, user_info, verbose=False, kind='gene'):
+def query_complexity(seq, user_info, verbose:bool=False, kind:str='gene', gene_name=None):
     token = get_token(user_info)['access_token']
 
     url_dict = {}
@@ -292,11 +293,10 @@ def query_complexity(seq, user_info, verbose=False, kind='gene'):
         )
     
     response_dict = json.loads(response.text)
-    print(response_dict)
 
     if user_info['consent_to_data_collection']:
         vprint(f"storing response at {data_collection_basedir}", verbose)
-        store_response(response_dict, seq, kind)
+        store_response(response_dict, gene_name, seq, kind)
 
     return response_dict
 
@@ -319,7 +319,7 @@ if __name__ == "__main__":
     idt_user_info = get_user_info(user_info_file)
 
     for record in SeqIO.parse(args.fasta, "fasta"):
-        response = query_complexity(record.seq, idt_user_info, kind=args.kind)[0]
+        response = query_complexity(record.seq, idt_user_info, kind=args.kind, gene_name=record.id)[0]
         score = 0
         if len(response) == 0:
             score = 0
