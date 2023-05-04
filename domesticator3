@@ -56,7 +56,8 @@ naive_vector_records = input_parsing.make_naive_vector_records(base_vector_recor
 
 ###### optimize ######
 optimized_vector_solutions = []
-for record in naive_vector_records:
+for i,record in enumerate(naive_vector_records):
+	print("-"*40 + f" {i+1}/{len(naive_vector_records)} " + "-"*40)
 	print(f"Attempting optimization of {record.name}")
 	initial_problem = DnaOptimizationProblem.from_record(record)
 	if args.no_opt:
@@ -99,7 +100,7 @@ for record in naive_vector_records:
 					seq = feature.extract(sol_record.seq)
 					break
 			assert seq != ""
-			response = idt.query_complexity(seq,idt_user_info, args.idt_kind)
+			response = idt.query_complexity(seq, idt_user_info, kind=args.idt_kind, gene_name=record.name)
 			# if len(response[0]) == 0:
 			#       print("no issue!")
 			score_sum = 0

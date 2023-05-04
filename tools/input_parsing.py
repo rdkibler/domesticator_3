@@ -270,14 +270,13 @@ def replace_sequence_in_record(record, location, insert) -> SeqRecord.SeqRecord:
 
 def make_naive_vector_records(
     base_vector_record, protein_filepaths, increasing_chain_fasta=False
-) -> Generator[SeqRecord.SeqRecord, None, None]:
-    """yields Biopython SeqRecord.SeqRecords
-
-    A generator which loads the proteins, randomly reverse translates each one, inserts them into the vectors.
-    and yields
+) -> list:
+    """returns a list of Biopython SeqRecord.SeqRecords which have randomly reverse-translated inserts in the base_vector_record
 
     rdkibler 210320
     """
+
+    output_records = []
 
     insert_locations = get_insert_locations(base_vector_record)
     # print(insert_locations)
@@ -292,7 +291,7 @@ def make_naive_vector_records(
                 vec_name = intermediate_vector_record.name
                 insert_name = insert.name
                 intermediate_vector_record.name = f"{insert_name}__{vec_name}"
-                yield intermediate_vector_record
+                output_records.append(intermediate_vector_record)
         else:
             intermediate_vector_record = copy.deepcopy(base_vector_record)
             for insert in inserts:
@@ -308,7 +307,9 @@ def make_naive_vector_records(
             vec_name = intermediate_vector_record.name
             insert_name = insert.name[:-2]  # cuts off _A or whatever chain ID it is
             intermediate_vector_record.name = f"{insert_name}__{vec_name}"
-            yield intermediate_vector_record
+            output_records.append(intermediate_vector_record)
+        
+    return output_records
 
 
 def make_naive_vector_record_by_seq(
