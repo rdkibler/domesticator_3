@@ -48,8 +48,8 @@ DEFAULT_SPECIFICATIONS_DICT['MinimizeNumKmers'] = MinimizeNumKmers
 
 ###### load files ######
 if not args.no_idt:
-	idt.user_info_file, idt.token_file = idt.use_dir(args.idt_credentials_dir)
-	idt_user_info = idt.get_user_info(idt.user_info_file)
+	user_info_file = idt.use_dir(args.idt_credentials_dir)
+	idt_user_info = idt.get_user_info(user_info_file)
 
 base_vector_record = input_parsing.load_vector_record(args.vector)
 naive_vector_records = input_parsing.make_naive_vector_records(base_vector_record,args.proteins,args.single_protein_fasta)
@@ -99,8 +99,7 @@ for record in naive_vector_records:
 					seq = feature.extract(sol_record.seq)
 					break
 			assert seq != ""
-			idt_token = idt.get_token(idt.token_file,idt_user_info)
-			response = idt.query_complexity(seq,idt_token["access_token"], args.idt_kind)
+			response = idt.query_complexity(seq,idt_user_info, args.idt_kind)
 			# if len(response[0]) == 0:
 			#       print("no issue!")
 			score_sum = 0

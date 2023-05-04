@@ -219,7 +219,7 @@ def store_response(response_dict, seq, kind):
     username = os.getlogin()
 
     data_collection_dir = os.path.join(data_collection_basedir,username, date)
-    os.makedirs(data_collection_dir)
+    os.makedirs(data_collection_dir, exist_ok=True)
 
     data = {}
     data['response'] = response_dict
