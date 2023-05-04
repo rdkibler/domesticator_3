@@ -6,11 +6,13 @@ import json
 import requests
 import base64
 import argparse
+import datetime
 
 from base64 import b64encode
 import json
 from urllib import request, parse
 
+data_collection_basedir = "/net/shared/idt_dna/sequence_complexity_data_raw"
 
 def vprint(str, verbose=False, **kwargs):
     if verbose:
@@ -19,8 +21,8 @@ def vprint(str, verbose=False, **kwargs):
 
 def use_dir(dir):
     user_info_file = os.path.expanduser(os.path.join(dir, "info.json"))
-    token_file = os.path.expanduser(os.path.join(dir, "token.json"))
-    return user_info_file, token_file
+    # token_file = os.path.expanduser(os.path.join(dir, "token.json"))
+    return user_info_file #, token_file
 
 
 def ask_for_user_data(user_info_file):
@@ -75,6 +77,41 @@ def get_user_info(user_info_file):
         with open(user_info_file, "w+") as f:
             json.dump(user_info, f)
 
+    if "token_file_path" not in user_info:
+        user_info["token_file_path"] = os.path.join(
+            os.path.dirname(user_info_file), "token.json"
+        )
+
+        with open(user_info_file, "w+") as f:
+            json.dump(user_info, f)
+
+    #look for the consent_to_data_collection field
+    if "consent_to_data_collection" not in user_info:
+        print("We want to build a fast IDT score predictor. In order to do")
+        print("this we need to collect the DNA sequences you send to IDT ")
+        print("and the scores that IDT sends back. This is optional but your")
+        print("contribution will help us build a better predictor. We will NOT")
+        print("publish or make publically available any of your data. Do you")
+        print("consent? (y/n)")
+
+        while True:
+            consent = input()
+            if consent.lower() == "y":
+                user_info["consent_to_data_collection"] = True
+                print("Awesome! Thank you for helping us build a better predictor.")
+                break
+            elif consent.lower() == "n":
+                user_info["consent_to_data_collection"] = False
+                print("Ok... but if you change your mind you can always change")
+                print("this setting in the file:")
+                print(os.path.abspath(user_info_file))
+                break
+            else:
+                print("Please enter y or n")
+
+        with open(user_info_file, "w+") as f:
+            json.dump(user_info, f)
+
     return user_info
 
 
@@ -87,9 +124,9 @@ def store_token(token, token_file):
     delete_stored_token(token_file)
     # do it this weird way just to make sure nobody can see your private stuff
     # creates an empty file
-    Path(user_info_file).touch()
+    Path(token_file).touch()
     # make it so only the user can acces this file
-    os.chmod(user_info_file, 0o600)
+    os.chmod(token_file, 0o600)
     # now write the secret stuff ;)
     with open(token_file, "w+") as f:
         json.dump(token, f)
@@ -155,7 +192,8 @@ def get_stored_token(token_file):
         return json.load(f)
 
 
-def get_token(token_file, user_info, verbose=False):
+def get_token(user_info, verbose=False):
+    token_file = user_info['token_file_path']
     get_token_flag = False
     if os.path.exists(token_file):
         vprint(f"using token stored at {token_file}", verbose)
@@ -175,8 +213,31 @@ def get_token(token_file, user_info, verbose=False):
         store_token(token, token_file)
     return token
 
+def store_response(response_dict, seq, kind):
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
+    timestamp = datetime.datetime.now().strftime("%H-%M-%S-%f")[:-3]
+    username = os.getlogin()
 
-def query_complexity(seq, token,verbose=False, kind='gene'):
+    data_collection_dir = os.path.join(data_collection_basedir,username, date)
+    os.makedirs(data_collection_dir)
+
+    data = {}
+    data['response'] = response_dict
+    data['timestamp'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    data['username'] = username
+    data['kind'] = str(kind)
+    data['sequence'] = str(seq)
+
+    filename = f"{timestamp}.json"
+    filepath = os.path.join(data_collection_dir, filename)
+
+    with open(filepath, "w+") as f:
+        json.dump(data, f)
+
+
+
+def query_complexity(seq, user_info, verbose=False, kind='gene'):
+    token = get_token(user_info)['access_token']
 
     url_dict = {}
     url_dict['gene'] = "https://www.idtdna.com/Restapi/v1/Complexities/ScreenGeneSequences"
@@ -229,8 +290,15 @@ def query_complexity(seq, token,verbose=False, kind='gene'):
         raise RuntimeError(
             f"Request failed with error code: {response.status_code} \nBody:\n{response.text}"
         )
+    
+    response_dict = json.loads(response.text)
+    print(response_dict)
 
-    return json.loads(response.text)
+    if user_info['consent_to_data_collection']:
+        vprint(f"storing response at {data_collection_basedir}", verbose)
+        store_response(response_dict, seq, kind)
+
+    return response_dict
 
 
 if __name__ == "__main__":
@@ -247,18 +315,18 @@ if __name__ == "__main__":
     parser.add_argument('-k', '--kind', type=str, help='kind of sequence to query', default='gene', choices = ['gene','gblock','gblock_hifi','eblock','old'])
     args = parser.parse_args()
 
-    user_info_file, token_file = use_dir(args.credential_dir)
+    user_info_file = use_dir(args.credential_dir)
     idt_user_info = get_user_info(user_info_file)
 
     for record in SeqIO.parse(args.fasta, "fasta"):
-        token = get_token(token_file, idt_user_info)
-        response = query_complexity(record.seq, token["access_token"], kind=args.kind)[0]
+        response = query_complexity(record.seq, idt_user_info, kind=args.kind)[0]
         score = 0
         if len(response) == 0:
             score = 0
         else:
             for issue in response:
                 score += issue["Score"]
+        
         print(record.id, record.seq, score)
 
 """
