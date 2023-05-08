@@ -254,12 +254,20 @@ def query_complexity(seq, user_info, verbose:bool=False, kind:str='gene', gene_n
     payload = f'[{{"Name":"My gBlock","Sequence":"{seq}"}}]'
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
 
+    error500_retry_counter = 10
     while True:
         response = requests.request("POST", url, headers=headers, data=payload)
         if response.status_code == 429:
             print(response.text)
             vprint("Rate limited, waiting 10 seconds", verbose)
             time.sleep(10)
+        elif response.status_code == 500:
+            print(response.text)
+            print("IDT internal server error, trying again in 30 seconds")
+            time.sleep(30)
+            error500_retry_counter -= 1
+            if error500_retry_counter == 0:
+                break
         else:
             break
 
