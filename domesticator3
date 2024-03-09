@@ -29,7 +29,7 @@ parser.add_argument("--skip_log_files", action="store_true", help="do not write 
 parser.add_argument("--skip_param_file", action="store_true", help="do not write translated_proteins.param file at the end of the optimization.")
 parser.add_argument("--skip_order_file", action="store_true", help="do not write order.dna.fasta file at the end of the optimization.")
 
-parser.add_argument("--break_if_max_tries", action="store_true", help="break the current gene if no soultion is found more than max_tries.")
+parser.add_argument("--break_if_max_tries", action="store_true", help="break the current gene if no soultion is found after max_tries.")
 
 parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
 
