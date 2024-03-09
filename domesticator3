@@ -29,6 +29,8 @@ parser.add_argument("--skip_log_files", action="store_true", help="do not write 
 parser.add_argument("--skip_param_file", action="store_true", help="do not write translated_proteins.param file at the end of the optimization.")
 parser.add_argument("--skip_order_file", action="store_true", help="do not write order.dna.fasta file at the end of the optimization.")
 
+parser.add_argument("--break_if_max_tries", action="store_true", help="break the current gene if no soultion is found more than max_tries.")
+
 parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
 
 args = parser.parse_args()
@@ -95,8 +97,12 @@ for i,record in enumerate(naive_vector_records):
 				continue
 
 		if trial == args.max_tries:
-			print("Skipping...")
-			continue
+			if not args.break_if_max_tries:
+				print("Skipping...")
+				continue
+			else:
+				print("Max tries reached. Breaking current gene from loop.")
+				break
 
 		if not args.no_idt:
 			print("querying IDT")
@@ -131,6 +137,10 @@ for i,record in enumerate(naive_vector_records):
 				objective.boost = objective.boost + args.ramp_kmers_boost
 				print(f"DEBUG! boosting {str(objective)} by {args.ramp_kmers_boost}. Value is now {objective.boost}")
 				break
+
+	if args.break_if_max_tries and trial == args.max_tries:
+		print("Gene unoptimizable; suppressing output.")
+		continue
 
 	if not args.no_idt:
 		best_idx = np.argmin(idt_scores)
