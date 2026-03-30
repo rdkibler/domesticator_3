@@ -1,0 +1,3 @@
+[submodule "tools/GeneLM"]
+	path = tools/GeneLM
+	url = https://github.com/Bioinformatics-UM6P/GeneLM.git
