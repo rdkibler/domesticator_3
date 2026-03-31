@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser(prog='domesticator3', description='A sophistica
 parser.add_argument("proteins", type=str, nargs="+", help="Either one or more fasta files containing one or more protein sequences or one or more pdb files")
 parser.add_argument("vector", type=str, help="A genbank (.gb) file containing annotations in the domesticator format to control domesticator function")
 
-parser.add_argument("--single_protein_fasta", action="store_true",help="Assign increasing chain letters in the order that they appear in the file. Lettering resets between files. This is useful for multiple insertions with a fasta file")
+parser.add_argument("--single_protein_fasta", action="store_true", help="Assign increasing chain letters in the order that they appear in the file. Lettering resets between files. This is useful for multiple insertions with a fasta file")
 
 parser.add_argument("--nstruct", type=int, default=10, help="number of times to repeat optimization before picking one to return. Default: %(default)d")
 parser.add_argument("--max_tries", type=int, default=3, help="number of times to restart optimization before giving up if no solution is found. Default: %(default)d")
@@ -22,6 +22,14 @@ parser.add_argument('--idt_kind', type=str, help='kind of sequence to query', de
 parser.add_argument("--no_opt", action="store_true",help="bypass the gene optimization step. Useful for debugging new vectors")
 parser.add_argument("--ramp_kmers_boost", type=float, default=0, help="increase the boost of the kmers objective after each failed optimization. Default: %(default)f")
 
+parser.add_argument("--do_not_append_vector_name", action="store_true", help="do not append vector name to the gene name.")
+
+parser.add_argument("--skip_gb_files", action="store_true", help="do not write *.gb files for each sequence at the end of the optimization.")
+parser.add_argument("--skip_log_files", action="store_true", help="do not write *.log files for each sequence at the end of the optimization.")
+parser.add_argument("--skip_param_file", action="store_true", help="do not write translated_proteins.param file at the end of the optimization.")
+parser.add_argument("--skip_order_file", action="store_true", help="do not write order.dna.fasta file at the end of the optimization.")
+
+parser.add_argument("--break_if_max_tries", action="store_true", help="break the current gene if no soultion is found after max_tries.")
 
 parser.add_argument('--version', action='version', version='%(prog)s alpha 1.0')
 
@@ -52,10 +60,13 @@ if not args.no_idt:
 	idt_user_info = idt.get_user_info(user_info_file)
 
 base_vector_record = input_parsing.load_vector_record(args.vector)
-naive_vector_records = input_parsing.make_naive_vector_records(base_vector_record,args.proteins,args.single_protein_fasta)
+naive_vector_records = input_parsing.make_naive_vector_records(base_vector_record,args.proteins,args.single_protein_fasta,args.do_not_append_vector_name)
 
-###### optimize ######
+###### optimize and write i/o ######
 optimized_vector_solutions = []
+records_to_synthesize = []
+all_protein_params = []
+
 for i,record in enumerate(naive_vector_records):
 	print("-"*40 + f" {i+1}/{len(naive_vector_records)} " + "-"*40)
 	print(f"Attempting optimization of {record.name}")
@@ -86,8 +97,12 @@ for i,record in enumerate(naive_vector_records):
 				continue
 
 		if trial == args.max_tries:
-			print("Skipping...")
-			continue
+			if not args.break_if_max_tries:
+				print("Skipping...")
+				continue
+			else:
+				print("Max tries reached. Breaking current gene from loop.")
+				break
 
 		if not args.no_idt:
 			print("querying IDT")
@@ -123,7 +138,9 @@ for i,record in enumerate(naive_vector_records):
 				print(f"DEBUG! boosting {str(objective)} by {args.ramp_kmers_boost}. Value is now {objective.boost}")
 				break
 
-
+	if args.break_if_max_tries and trial == args.max_tries:
+		print("Gene unoptimizable; suppressing output.")
+		continue
 
 	if not args.no_idt:
 		best_idx = np.argmin(idt_scores)
@@ -134,6 +151,46 @@ for i,record in enumerate(naive_vector_records):
 	best_solution = solutions[best_idx]
 	optimized_vector_solutions.append(best_solution)
 
+	#report here
+	print("REPORTING CURRENT")
+	optimized_vector_solution = optimized_vector_solutions[-1]
+	#optimized_vector_solution.record stores the NAIVE RECORD, so we need to use to_record()
+	#however I think the annotations to the generated record (from to_record()) are bad, so instead let's just transplant the sequence
+	optimized_vector_record = optimized_vector_solution.record
+	optimized_vector_record.seq = Seq(optimized_vector_solution.sequence)
+
+	if not args.skip_gb_files:
+		Bio.SeqIO.write(optimized_vector_record, optimized_vector_record.name + ".gb","genbank")
+
+	fragment_to_synthesize = None
+	for feature in optimized_vector_record.features:
+			if feature.type == "domesticator" and feature.qualifiers['label'] == ["synthesize"]:
+				fragment_to_synthesize = feature.extract(optimized_vector_record.seq)
+				break
+	assert fragment_to_synthesize != ""
+	record_to_synthesize = Bio.SeqRecord.SeqRecord(seq=fragment_to_synthesize,id=optimized_vector_record.name,name=optimized_vector_record.name,description="")
+
+	records_to_synthesize.append(record_to_synthesize)
+
+	if not args.skip_gb_files:
+		with open(optimized_vector_record.name + ".log",'w') as f:
+			f.write(optimized_vector_solution.constraints_text_summary() + "\n")
+			f.write(optimized_vector_solution.objectives_text_summary() + "\n")
+
+	polypeptides = product_analysis.find_polypeptides(optimized_vector_record)
+	protein_params = product_analysis.get_params(polypeptides)
+	all_protein_params.append(protein_params)
+	#TODO: Add support for detection of protease cleavage sites and printing of the fragment params
+
+	#kinda dumb Bio.SeqIO doesn't have a append function?
+	if not args.skip_param_file:
+		pd.concat(all_protein_params).to_csv("translated_proteins.params")
+	if not args.skip_order_file:
+		Bio.SeqIO.write(records_to_synthesize, "order.dna.fasta","fasta")
+
+
+
+'''
 ###### create reports and outputs ######
 print("REPORT")
 records_to_synthesize = []
@@ -167,7 +224,7 @@ for optimized_vector_solution in optimized_vector_solutions:
 
 pd.concat(all_protein_params).to_csv("translated_proteins.params")
 Bio.SeqIO.write(records_to_synthesize, "order.dna.fasta","fasta")
-
+'''
 
 
 # ## start debug block -- gives user the steering wheel
